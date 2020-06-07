@@ -1,44 +1,97 @@
-# Challenges
+### iHeros - Teste Fullstack
+    
+Este é o teste usado por nós aqui da ZRP para avaliar tecnicamente os candidatos a nossas vagas de desenvolvedores Fullstack. Se você estiver participando de um processo seletivo para nossa equipe, certamente em algum momento receberá este link, mas caso você tenha chegado aqui "por acaso", sinta-se convidado a desenvolver nosso teste e enviar uma mensagem para nós no e-mail jobs@zrp.com.br.
 
-Com o objetivo de se tornar um funcionário ZRP você precisa provar para o nosso timme, um grupo de profissionais extremamente competentes e habilidosos, que você será capaz de analisar, prever e desenvolver as tarefas que te forem designadas.
+Aqui na ZRP nós aplicamos este mesmo teste para as vagas em todos os níveis, ou seja, um candidato a uma vaga de dev júnior fará o mesmo teste de um outro candidato a uma vaga de dev sênior, mudando obviamente o nosso critério de avaliação do resultado do teste.
 
-Para cada um dos possíveis cargos que você for se candidatar haverá desafios dos mais diversos níveis, podendo estes serem _fáceis_, _normais_ ou _difíceis_. Você pode submeter o teste que achar que mais se encaixa com o seu perfil.
+Nós fazemos isso esperando que as pessoas mais iniciantes entendam qual o modelo de profissional que temos por aqui e que buscamos para o nosso time. Portanto, se você estiver se candidatando a uma vaga mais iniciante, não se assuste, e faça o melhor que você puder!
 
-## Como submeter o seu projeto
+### Instruções
 
-Cada área e cada projeto tem a sua própria regra quanto a submissão do desafio. Leia atentamente as regras e instruções antes de enviar seu projeto.
+Você deverá criar um fork deste projeto, e desenvolver em cima do seu fork. Use o README principal do seu repositório para nos contar como foi resolver seu teste, as decisões tomadas, como você organizou e separou seu código, e principalmente as instruções de como rodar seu projeto.
 
-> Dúvidas? Envie um email para [jobs@zrp.com.br](jobs@zrp.com.br).
+Lembre-se que este é um teste técnico e não um concurso público, portanto, não existe apenas uma resposta correta. Mostre que você é bom e nos impressione, mas não esqueça do objetivo do projeto.
 
-## Como o processo seletivo da ZRP funciona
+Nós não definimos um tempo limite para resolução deste teste, o que vale para nós e o resultado final e a evolução da criação do projeto até se atingir este resultado.
+    
 
-### Primeira Fase - Seleção
+#### Descrição
+> Rede de cadastro(test backend) e distribuição(test frontend) de heroes, levando em consideração o nível da ameaça que estaria atacando uma determinada região.
 
-Na primeira fase você será avaliado por um dos sócios da ZRP. O objetivo dessa avaliação é ver se você possui aderência à cultura da empresa. Nós prezamos por pessoas prestativas, pró-ativas, comunicativas e interessadas em aprender. Suas core skills serão os seus diferenciais aqui.
+Você está no ano de 3150 e está a frente do setor de tecnologia responsável pelo desenvolvimento do sistema de gerenciamento de distribuição de Heros para combater ameaças. O sistema deve monitorar o sistema de alertas de ameças provido pela ONU e alocar os herois para cada nova ameaça existente no globo terrestre. 
 
-### Segunda Fase - Desafio
+Para isso, será preciso implementar as seguintes funcionalidades:
 
-Se você passar na primeira fase você deverá escolher um desafio que você deseja enviar e nos dar uma previsão de quanto tempo você demorará para enviar aquele desafio.
-Não há tempo limite para a submissão, porém você será avaliado pela sua capacidade de prever seu tempo de entrega.
+ - Autenticação
+ - Cadastre, edite, remova e liste herois
+ - Aloque automaticamente o heroi mais adequado quando uma nova ameaça surgir.
+ - Registre a desalocação de um heroi (entende-se por desalocação, o ato do heroi ja ter derrotado a ameaça, depois dele ter sido alocado).
+ - Exiba o histórico de ameaças junto com quem foi o responsável por impedir a catástrofe.
 
-Depois desse envio nosso time irá avaliar se:
+Além disso, o lider de operações ordenou as seguintes regras para o desenvolvimento da aplicação:
+- Cada **Hero** e **Ameaça** tem um rank
+- Os herois devem ser alocados de acordo com sua localização e rank adequado ao nível de ameaças. 
+- Os ranks são os seguintes:
 
-- Você teve uma boa previsão do tempo que você levaria para resolver o problema
-- Resolveu com precisão o problema apresentado
-- Cumpriu com os requisitos e critérios de avaliação daquele desafio
+**Heroes**
+Classe S, A, B e C.
 
-### Terceira Fase - Feedback
+**Ameaças**
+Nível Gold, Silver, Copper e Wood.
 
-Para aqueles que submeteram o desafio da segunda fase haverá uma revisão do desafio pelo nosso time e te chamaremos para um breve call de feedback dizendo se você foi contratado ou não e o porque da decisão.
+- Herois do rank classe "S" tem prioridade sobre ameaças do tipo "Gold";
+- Herois do rank classe "A" tem prioridade sobre ameaças do tipo "Silver";
+- Herois do rank classe "B" tem prioridade sobre ameaças do tipo "Copper";
+- Herois do rank classe "C" tem prioridade sobre ameaças do tipo "Wood";
 
-### Escolha o seu caminho
+> Bônus: Alocar multiplos herois de ranks menores em uma mesma ameaça de rank maior. (Utilize a proporção que achar melhor).
 
-Para qual vaga você está se candidatando?
+Você devera consumir um socket que retornas as informações das ameaças, cada ameça tem o seguinte formato de objeto:
 
-- [Desenvolvedor](./dev)
-- [Devops](./devops)
-- [Designer](./design)
-- [PO](./po)
-- [QA](./qa)
-- [Comercial](./comercial)
-- [RH](./rh)
+``` 
+{
+    location: {
+        lat: -5.836597,
+        lng: -35.236007,
+    },
+    dangerLevel: 'S',
+    monsterName: 'Black Dragon',
+}
+```
+
+A url do serviço de socket é a: 
+
+`https://zrp-challenge-socket.herokuapp.com:443`
+
+E o evento a ser escutado é o `occurrence` 
+
+
+### Tecnologias 
+
+**Frontend**
+
+- Vue
+- Angular
+- React
+
+**Backend**
+
+- Node.Js
+- Ruby
+- Python
+- Elixir
+- C#
+- Go
+
+Para persisitir os dados utilize o meio que achar mais conveniente :).
+
+###  O que iremos avaliar
+
+- Modelagem de Dados
+- Domínio da Linguagem
+- Legibilidade do Código
+- Estrutura do Código
+- Organização do Código
+- Design Patterns
+- Manutenibilidade do Código
+- Testes Unitários e Cobertura de Testes
