@@ -2,7 +2,6 @@ import pytest
 
 
 @pytest.mark.integration
-@pytest.mark.skip
 def test_health_check(test_client, env_settings):
     with test_client:
         response = test_client.get("/status")
