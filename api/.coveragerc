@@ -2,7 +2,7 @@
 omit =
     iheroes_api/__main__.py
     iheroes_api/__init__.py
-    iheroes_api/**/protocols/*
+    iheroes_api/**/protocols.py
     iheroes_api/infra/database/alembic/*
     iheroes_api/infra/database/seeds.py
     iheroes_api/infra/database/sqlalchemy.py
