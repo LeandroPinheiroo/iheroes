@@ -13,7 +13,7 @@ class User(BaseModel):
     class Config:
         allow_mutation = False
 
-    id_: int = Field(..., alias="id")
+    id: int  # noqa: A003
     email: EmailStr
     password_hash: str
 
@@ -22,5 +22,5 @@ class UserRegistry(BaseModel):
     class Config:
         allow_mutation = False
 
-    id_: int = Field(..., alias="id")
+    id: int  # noqa: A003
     email: EmailStr
