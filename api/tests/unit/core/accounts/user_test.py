@@ -102,7 +102,7 @@ class TestUser:
     class TestModel:
         valid_st = st.fixed_dictionaries(
             {
-                "id": st.integers(),
+                "id": tst.ids(),
                 "email": tst.emails(),
                 "password_hash": tst.password_hashes(),
             }
@@ -151,7 +151,7 @@ class TestUser:
         @given(
             st.fixed_dictionaries(
                 {
-                    "id": st.integers(),
+                    "id": tst.ids(),
                     "email": st.text(),
                     "password_hash": tst.password_hashes(),
                 }
@@ -165,7 +165,7 @@ class TestUser:
 
         @given(
             st.fixed_dictionaries(
-                {"id": st.integers(), "password_hash": tst.password_hashes()}
+                {"id": tst.ids(), "password_hash": tst.password_hashes()}
             )
         )
         def test_is_required(self, data):
@@ -177,7 +177,7 @@ class TestUser:
     class TestPasswordHash:
         assert_validation_error = partial(assert_validation_error, 1, "password_hash")
 
-        @given(st.fixed_dictionaries({"id": st.integers(), "email": tst.emails()}))
+        @given(st.fixed_dictionaries({"id": tst.ids(), "email": tst.emails()}))
         def test_is_required(self, data):
             with pytest.raises(ValidationError) as excinfo:
                 User(**data)
@@ -189,7 +189,7 @@ class TestUser:
 @pytest.mark.hypothesis
 class TestUserRegistry:
     class TestModel:
-        valid_st = st.fixed_dictionaries({"id": st.integers(), "email": tst.emails()})
+        valid_st = st.fixed_dictionaries({"id": tst.ids(), "email": tst.emails()})
         invalid_st = st.fixed_dictionaries(
             {"id": st.text().filter(lambda i: not i.isnumeric()), "email": st.text()}
         )
@@ -230,7 +230,7 @@ class TestUserRegistry:
         @given(
             st.fixed_dictionaries(
                 {
-                    "id": st.integers(),
+                    "id": tst.ids(),
                     "email": st.text(),
                     "password_hash": tst.password_hashes(),
                 }
@@ -244,7 +244,7 @@ class TestUserRegistry:
 
         @given(
             st.fixed_dictionaries(
-                {"id": st.integers(), "password_hash": tst.password_hashes()}
+                {"id": tst.ids(), "password_hash": tst.password_hashes()}
             )
         )
         def test_is_required(self, data):
