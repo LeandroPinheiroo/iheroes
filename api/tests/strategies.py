@@ -2,8 +2,6 @@ import hypothesis.strategies as st
 from email_validator import EmailNotValidError, validate_email
 from toolz.functoolz import excepts
 
-from iheroes_api.core.accounts import hash_service
-
 
 # Hypothesis generates emails as specified by
 # [RFC 5322#section-3.4.1](https://tools.ietf.org/html/rfc5322.html#section-3.4.1)
@@ -27,4 +25,4 @@ def passwords():
 
 
 def password_hashes():
-    return passwords().map(hash_service.hash_)
+    return passwords().map(hash).map(str)

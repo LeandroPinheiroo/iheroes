@@ -1,12 +1,12 @@
 from functools import partial
 
-import hypothesis.strategies as st
 import pytest
 from hypothesis import given
+from hypothesis import strategies as st
 from pydantic import ValidationError
 
 import tests.strategies as tst
-from iheroes_api.core.accounts.user import Credentials, User
+from iheroes_api.core.accounts.user import Credentials, User, UserRegistry
 from tests.utils.asserts import assert_validation_error
 
 
@@ -44,7 +44,11 @@ class TestCredentials:
     class TestEmail:
         assert_validation_error = partial(assert_validation_error, 1, "email")
 
-        @given(st.fixed_dictionaries({"email": st.text(), "password": tst.passwords()}))
+        @given(
+            st.fixed_dictionaries(
+                {"email": st.text(), "password": tst.passwords().filter(str.isalnum)}
+            )
+        )
         def test_must_be_email(self, data):
             with pytest.raises(ValidationError) as excinfo:
                 Credentials(**data)
@@ -132,21 +136,6 @@ class TestUser:
 
         @given(
             st.fixed_dictionaries(
-                {
-                    "id": st.text().filter(lambda i: not i.isnumeric()),
-                    "email": tst.emails(),
-                    "password_hash": tst.password_hashes(),
-                }
-            )
-        )
-        def test_must_be_int(self, data):
-            with pytest.raises(ValidationError) as excinfo:
-                User(**data)
-
-            self.assert_validation_error("type_error.integer", excinfo)
-
-        @given(
-            st.fixed_dictionaries(
                 {"email": tst.emails(), "password_hash": tst.password_hashes()}
             )
         )
@@ -188,24 +177,78 @@ class TestUser:
     class TestPasswordHash:
         assert_validation_error = partial(assert_validation_error, 1, "password_hash")
 
-        @given(
-            st.fixed_dictionaries(
-                {
-                    "id": st.integers(),
-                    "email": tst.emails(),
-                    "password_hash": st.one_of(st.iterables(st.text())),
-                }
-            )
-        )
-        def test_must_be_str(self, data):
-            with pytest.raises(ValidationError) as excinfo:
-                User(**data)
-
-            self.assert_validation_error("type_error.str", excinfo)
-
         @given(st.fixed_dictionaries({"id": st.integers(), "email": tst.emails()}))
         def test_is_required(self, data):
             with pytest.raises(ValidationError) as excinfo:
                 User(**data)
+
+            self.assert_validation_error("value_error.missing", excinfo)
+
+
+@pytest.mark.unit
+@pytest.mark.hypothesis
+class TestUserRegistry:
+    class TestModel:
+        valid_st = st.fixed_dictionaries({"id": st.integers(), "email": tst.emails()})
+        invalid_st = st.fixed_dictionaries(
+            {"id": st.text().filter(lambda i: not i.isnumeric()), "email": st.text()}
+        )
+
+        @given(valid_st)
+        def test_validation(self, data):
+            assert UserRegistry(**data)
+
+        @given(invalid_st)
+        def test_invalidation(self, invalid_data):
+            with pytest.raises(ValidationError):
+                assert UserRegistry(**invalid_data)
+
+        @given(valid_st)
+        def test_immutability(self, data):
+            entity = UserRegistry(**data)
+            for key in entity.dict().keys():
+                with pytest.raises(TypeError):
+                    setattr(entity, key, "some value")
+
+    class TestId:
+        assert_validation_error = partial(assert_validation_error, 1, "id")
+
+        @given(
+            st.fixed_dictionaries(
+                {"email": tst.emails(), "password_hash": tst.password_hashes()}
+            )
+        )
+        def test_is_required(self, data):
+            with pytest.raises(ValidationError) as excinfo:
+                UserRegistry(**data)
+
+            self.assert_validation_error("value_error.missing", excinfo)
+
+    class TestEmail:
+        assert_validation_error = partial(assert_validation_error, 1, "email")
+
+        @given(
+            st.fixed_dictionaries(
+                {
+                    "id": st.integers(),
+                    "email": st.text(),
+                    "password_hash": tst.password_hashes(),
+                }
+            )
+        )
+        def test_must_be_email(self, data):
+            with pytest.raises(ValidationError) as excinfo:
+                UserRegistry(**data)
+
+            self.assert_validation_error("value_error.email", excinfo)
+
+        @given(
+            st.fixed_dictionaries(
+                {"id": st.integers(), "password_hash": tst.password_hashes()}
+            )
+        )
+        def test_is_required(self, data):
+            with pytest.raises(ValidationError) as excinfo:
+                UserRegistry(**data)
 
             self.assert_validation_error("value_error.missing", excinfo)
