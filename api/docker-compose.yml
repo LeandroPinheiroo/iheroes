@@ -26,6 +26,7 @@ services:
         DATABASE_PG_URL: "postgresql://postgres:dev1234@pgsql-db/iheroes-dev"
         HYPOTHESIS_PROFILE: "development"
         JWT_ACCESS_TOKEN_EXPIRE_MINUTES: 30
+        JWT_REFRESH_TOKEN_EXPIRE_MINUTES: 43800
         JWT_ALGORITHM: "HS256"
         JWT_SECRET_KEY: "f50c515c3bd3c2155f51e79a90dc9b6721415427c73cc9e4ac3145afed92d292"
         WEB_APP_DEBUG: "true"
