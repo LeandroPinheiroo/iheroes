@@ -1,9 +1,11 @@
 import pytest
 from fastapi.testclient import TestClient  # type: ignore
 
-from tests.utils.database import clear_database
-from iheroes_api.config.environment import get_settings
 from iheroes_api.api import init_app
+from iheroes_api.config.environment import get_settings
+from tests.utils.database import clear_database
+
+
 
 
 @pytest.fixture(name="env_settings")

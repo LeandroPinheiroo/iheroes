@@ -1,6 +1,9 @@
+from functools import partial
+
 from fastapi.applications import FastAPI
 from toolz import pipe
 
+from iheroes_api.api.container import get_dependencies
 from iheroes_api.api.routers import register_routers as register_routers
 from iheroes_api.config.environment import Settings
 from iheroes_api.infra.database.sqlalchemy import connect_database, disconnect_database
@@ -39,6 +42,6 @@ def init_app(settings: Settings) -> FastAPI:
         init_databases,
         register_events,
         register_middlewares,
-        register_routers,
+        partial(register_routers, settings, get_dependencies()),
     )
     return app
