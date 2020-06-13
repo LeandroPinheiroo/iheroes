@@ -6,7 +6,7 @@ from iheroes_api.core.accounts.user import Credentials, UserRegistry
 from iheroes_api.core.protocols import UserRepo
 
 
-async def get_by_crendentials(
+async def get_by_credentials(
     repo: UserRepo, credentials: Credentials
 ) -> Optional[UserRegistry]:
     user = await repo.fetch_by_email(credentials.email.lower())
