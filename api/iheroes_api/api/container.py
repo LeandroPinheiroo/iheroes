@@ -3,7 +3,7 @@ from typing import Callable, cast
 
 from databases import Database
 
-from iheroes_api.api.auth import build_auth_module
+from iheroes_api.api.modules.auth import build_auth_module
 from iheroes_api.api.protocols import AuthModule
 from iheroes_api.config.environment import get_settings
 from iheroes_api.core.protocols import UserRepo
