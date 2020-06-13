@@ -20,7 +20,6 @@ This project is comprised of the following languages and libraries:
 * Password hashing utilities: [Passlib](https://passlib.readthedocs.io/)
 * Data parsing and validation: [Pydantic](https://pydantic-docs.helpmanual.io/)
 * Test Runner: [Pytest](https://docs.pytest.org/en/latest/)
-* Property-based testing framework: [Hypothesis](https://hypothesis.works/)
 * Linter: [Flake8](https://flake8.pycqa.org/en/latest/)
 * Static type checker: [Mypy](https://mypy.readthedocs.io/en/stable/index.html)
 * Formatter: [Black](https://github.com/psf/black)

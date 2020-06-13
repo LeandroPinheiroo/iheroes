@@ -1,14 +1,13 @@
 import pytest
-from hypothesis import given
-from hypothesis import strategies as st
 
-import tests.strategies as tst
 from iheroes_api.core.accounts.exceptions import EmailNotUniqueError, UserNotFoundError
 
 
 @pytest.mark.unit
-@given(tst.emails(), st.text())
-def test_email_not_unique_error(email, msg):
+def test_email_not_unique_error():
+    email = "some@email.com"
+    msg = "some message"
+
     error = EmailNotUniqueError(email, msg)
     assert error.as_dict() == {"msg": msg, "email": email}
 
@@ -17,8 +16,7 @@ def test_email_not_unique_error(email, msg):
 
 
 @pytest.mark.unit
-@given(st.integers(), st.text())
-def test_user_not_found_error(id_, msg):
+def test_user_not_found_error():
     id_ = 1
     msg = "some message"
 

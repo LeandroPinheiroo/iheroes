@@ -9,5 +9,5 @@ def test_settings():
 
 
 @pytest.mark.unit
-def test_initial_settings():
+def test_get_settings():
     assert get_settings()
