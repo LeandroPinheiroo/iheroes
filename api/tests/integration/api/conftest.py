@@ -6,8 +6,6 @@ from iheroes_api.config.environment import get_settings
 from tests.utils.database import clear_database
 
 
-
-
 @pytest.fixture(name="env_settings")
 def env_settings():
     return get_settings()

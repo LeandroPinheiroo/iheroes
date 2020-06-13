@@ -71,6 +71,6 @@ class TestPersist:
         email, password_hash = attrgetter("email", "password_hash")(user)
         insert_user({**user.dict()})
 
-        with pytest.raises(UniqueViolationError):
-            async with database.transaction():
+        async with database.transaction():
+            with pytest.raises(UniqueViolationError):
                 await user_repository.persist(email, password_hash)
