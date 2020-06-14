@@ -19,15 +19,11 @@ class Token(BaseModel):
     token_type: Literal["bearer"] = "bearer"
     access_token: str
     expire: int
-    refresh_token: str
-    refresh_expire: int
 
 
 def build_router(setts: Settings, deps: Dependencies) -> APIRouter:
     router = APIRouter(default_response_class=JSONResponse)
-    access_expire, refresh_expire = attrgetter(
-        "JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "JWT_REFRESH_TOKEN_EXPIRE_MINUTES"
-    )(setts)
+    access_expire = attrgetter("JWT_ACCESS_TOKEN_EXPIRE_MINUTES")(setts)
     auth, repo = attrgetter("auth_module", "user_repo")(deps)
 
     @router.post(
@@ -52,14 +48,8 @@ def build_router(setts: Settings, deps: Dependencies) -> APIRouter:
             data={"sub": f"userid:{user.id}", "grant_type": "access"},
             expires_delta=timedelta(minutes=access_expire),
         )
-        rt, exp_rt = auth.encode_token(
-            data={"sub": f"userid:{user.id}", "grant_type": "refresh"},
-            expires_delta=timedelta(minutes=refresh_expire),
-        )
 
-        return Token(
-            access_token=at, expire=exp_at, refresh_token=rt, refresh_expire=exp_rt,
-        )
+        return Token(access_token=at, expire=exp_at)
 
     @router.get(
         "/introspect",
