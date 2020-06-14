@@ -1,4 +1,8 @@
-__all__ = ("User",)
+__all__ = (
+    "Hero",
+    "User",
+)
 
 
+from .hero import Hero
 from .user import User
