@@ -1,21 +1,12 @@
 import pytest
 from pytest_factoryboy import register
 
-from tests.factories.entity_factories import (
-    CredentialsFactory,
-    UserFactory,
-    UserRegistryFactory,
-)
+from tests.factories.entity_factories import CredentialsFactory, UserFactory
 
-factories = [CredentialsFactory, UserFactory, UserRegistryFactory]
+factories = [CredentialsFactory, UserFactory]
 
 for factory in factories:
     register(factory)
-
-
-@pytest.fixture()
-def user_registry(user_registry_factory):
-    return user_registry_factory()
 
 
 @pytest.fixture()
