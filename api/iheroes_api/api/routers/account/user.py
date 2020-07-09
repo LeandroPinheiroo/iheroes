@@ -1,6 +1,5 @@
-from functools import partial
+from operator import attrgetter
 
-from fastapi import Depends  # type: ignore
 from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse  # type: ignore
 from fastapi.routing import APIRouter
@@ -14,16 +13,16 @@ from iheroes_api.core.accounts.user import Credentials, UserRegistry
 
 # View models
 class EmailNotUniqueResponse(BaseModel):
-    class Detail(BaseModel):
+    class EmailNotUniqueDetail(BaseModel):
         msg: str
         email: str
 
-    detail: Detail
+    detail: EmailNotUniqueDetail
 
 
 def build_router(deps: Dependencies) -> APIRouter:
     router = APIRouter(default_response_class=JSONResponse)
-    database = deps.database
+    database, user_repo = attrgetter("database", "user_repo")(deps)
 
     @router.post(
         "",
@@ -38,14 +37,11 @@ def build_router(deps: Dependencies) -> APIRouter:
         },
     )
     @database.transaction()
-    async def post(
-        credentials: Credentials,
-        service=Depends(lambda: partial(user_service.register, deps.user_repo)),
-    ) -> UserRegistry:
+    async def post(credentials: Credentials,) -> UserRegistry:
         try:
-            result: UserRegistry = await service(credentials)
-            return result
+            result = await user_service.register(user_repo, credentials)
         except EmailNotUniqueError as err:
             raise HTTPException(409, detail=err.as_dict())
+        return result
 
     return router
