@@ -17,7 +17,7 @@ def hero_repo_fixture(mock_module):
 class TestCreate:
     async def test_success(self, hero_repo, user_registry, hero, create_hero_dto):
         hero_repo.persist.return_value = hero
-        result = await hero_service.create(hero_repo, create_hero_dto, user_registry)
+        result = await hero_service.create(hero_repo, user_registry, create_hero_dto)
 
         assert await hero_repo.persist.called_once_with(
             create_hero_dto, user_registry.id
@@ -33,7 +33,7 @@ class TestCreate:
 
         assert await hero_repo.persist.called_once_with(create_hero_dto, user_id)
         with pytest.raises(HeroNotUniqueError):
-            await hero_service.create(hero_repo, create_hero_dto, user_registry)
+            await hero_service.create(hero_repo, user_registry, create_hero_dto)
 
 
 @pytest.mark.unit
@@ -117,7 +117,7 @@ class TestUpdate:
         hero_repo.update.return_value = hero
 
         result = await hero_service.update(
-            hero_repo, update_hero_dto, user_registry, id_
+            hero_repo, user_registry, update_hero_dto, id_
         )
 
         assert await hero_repo.update.called_once_with(
@@ -131,7 +131,7 @@ class TestUpdate:
         hero_repo.update.return_value = None
 
         result = await hero_service.update(
-            hero_repo, update_hero_dto, user_registry, id_
+            hero_repo, user_registry, update_hero_dto, id_
         )
 
         assert await hero_repo.update.called_once_with(

@@ -17,11 +17,11 @@ class HeroRepo(Protocol):
     async def fetch_all_by_user(self, user_id: int) -> Iterable[Hero]:
         ...
 
-    async def persist(self, dto: CreateHeroDto, user_id: int) -> Hero:
+    async def persist(self, user_id: int, dto: CreateHeroDto) -> Hero:
         ...
 
     async def update(
-        self, dto: UpdateHeroDto, user_id: int, id_: int
+        self, user_id: int, dto: UpdateHeroDto, id_: int
     ) -> Optional[Hero]:
         ...
 

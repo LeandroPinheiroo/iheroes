@@ -6,8 +6,8 @@ from iheroes_api.core.heroes.hero import CreateHeroDto, Hero, UpdateHeroDto
 from iheroes_api.core.protocols import HeroRepo
 
 
-async def create(repo: HeroRepo, dto: CreateHeroDto, user: UserRegistry) -> Hero:
-    return await repo.persist(dto, user.id)
+async def create(repo: HeroRepo, user: UserRegistry, dto: CreateHeroDto) -> Hero:
+    return await repo.persist(user.id, dto)
 
 
 async def delete(repo: HeroRepo, user: UserRegistry, id_: int) -> bool:
@@ -26,5 +26,5 @@ async def get_all_by_user(repo: HeroRepo, user: UserRegistry) -> List[Hero]:
     return sorted(await repo.fetch_all_by_user(user.id), key=attrgetter("id"))
 
 
-async def update(repo: HeroRepo, dto: UpdateHeroDto, user: UserRegistry, id_: int):
-    return await repo.update(dto, user.id, id_)
+async def update(repo: HeroRepo, user: UserRegistry, dto: UpdateHeroDto, id_: int):
+    return await repo.update(user.id, dto, id_)
