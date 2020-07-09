@@ -5,6 +5,7 @@ from pytest_factoryboy import register
 from toolz import pipe
 from toolz.curried import do
 
+from iheroes_api.core.heroes.exceptions import HeroNotUniqueError
 from iheroes_api.infra.database.repositories import hero_repository
 from tests.factories.entity_factories import CreateHeroDtoFactory, UpdateHeroDtoFactory
 from tests.factories.model_factories import insert_hero, insert_user
@@ -134,18 +135,36 @@ async def test_fetch_all_by_user(database, make_user, make_heroes):
 
 @pytest.mark.integration
 @pytest.mark.asyncio
-async def test_persist(database, make_user, make_create_hero_dto):
-    user = make_user()
-    insert_user(user.dict())
+class TestPersist:
+    async def test_success(self, database, make_user, make_create_hero_dto):
+        user = make_user()
+        insert_user(user.dict())
 
-    dto = make_create_hero_dto()
+        dto = make_create_hero_dto()
 
-    async with database.transaction():
-        result = await hero_repository.persist(user.id, dto)
+        async with database.transaction():
+            result = await hero_repository.persist(user.id, dto)
 
-    assert attrgetter("user_id", "name", "nickname", "power_class", "location")(
-        result
-    ) == (user.id, *attrgetter("name", "nickname", "power_class", "location")(dto))
+        assert attrgetter("user_id", "name", "nickname", "power_class", "location")(
+            result
+        ) == (user.id, *attrgetter("name", "nickname", "power_class", "location")(dto))
+
+    async def test_hero_not_unique_error(
+        self, database, make_user, make_hero, make_create_hero_dto
+    ):
+        user = make_user()
+        insert_user(user.dict())
+
+        id_ = 1
+        user_id = user.id
+        hero = make_hero(id=id_, user_id=user_id)
+        insert_hero(hero.dict())
+
+        dto = make_create_hero_dto()
+
+        async with database.transaction():
+            with pytest.raises(HeroNotUniqueError):
+                await hero_repository.persist(user_id, dto)
 
 
 @pytest.mark.integration

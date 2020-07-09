@@ -1,5 +1,8 @@
 from typing import Iterable, Optional
 
+from asyncpg.exceptions import UniqueViolationError
+
+from iheroes_api.core.heroes.exceptions import HeroNotUniqueError
 from iheroes_api.core.heroes.hero import CreateHeroDto, Hero, UpdateHeroDto
 from iheroes_api.infra.database.models import Hero as HeroModel
 from iheroes_api.infra.database.sqlalchemy import database
@@ -52,7 +55,11 @@ async def persist(user_id: int, dto: CreateHeroDto) -> Hero:
     values = {**dto.dict(), "user_id": user_id}
     query = HeroModel.insert().values(**values)
 
-    last_record_id = await database.execute(query)
+    try:
+        last_record_id = await database.execute(query)
+    except UniqueViolationError:
+        raise HeroNotUniqueError(user_id, dto.name, dto.nickname)
+
     return Hero.parse_obj({**values, "id": last_record_id})
 
 

@@ -43,7 +43,7 @@ class CreateHeroDto(BaseModel):
     class Config:
         allow_mutation = False
 
-    name: Optional[str] = Name
+    name: str = Name
     nickname: str = Nickname
     power_class: PowerClass
     location: Location
