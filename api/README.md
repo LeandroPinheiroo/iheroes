@@ -51,15 +51,15 @@ The IDE should be automatically configured with standard rules and options for o
 To run the API in development mode, follow these steps:
 
 * Start a container with: `plis start --service-ports api ash`
-* Inside the container run: `poetry install`
-* Start the web server with: `poetry run web_server`
-* Seed DB data with: `poetry run seeder`
 * Run migrations with: `alembic upgrade head`
+* Seed DB data with: `poetry run seeder`
+* Start the web server with: `poetry run web_server`
 * Test the API with: `pytest`
 * Check code style with: `black --check todolist`
-* Format code with: `black todolist`
+* Format code with: `black todolist tests`
 * Lint the code with: `flake8 todolist tests`
 * Run static analysis with: `mypy job_form_api tests`
+* Run entire validation stack with: `black todolist tests && flake8 todolist tests && mypy job_form_api tests && pytest`
 
 ### PGAdmin
 
