@@ -58,7 +58,7 @@ async def persist(user_id: int, dto: CreateHeroDto) -> Hero:
     try:
         last_record_id = await database.execute(query)
     except UniqueViolationError:
-        raise HeroNotUniqueError(user_id, dto.name, dto.nickname)
+        raise HeroNotUniqueError()
 
     return Hero.parse_obj({**values, "id": last_record_id})
 
@@ -74,6 +74,10 @@ async def update(user_id: int, dto: UpdateHeroDto, id_: int) -> Optional[Hero]:
         .where(HeroModel.c.id == id_)
         .values(**values)
     )
-    await database.execute(query)
+
+    try:
+        await database.execute(query)
+    except UniqueViolationError:
+        raise HeroNotUniqueError()
 
     return await fetch(user_id, id_)

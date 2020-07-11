@@ -26,14 +26,12 @@ class TestCreate:
 
     async def test_conflict(self, hero_repo, user_registry, create_hero_dto):
         user_id = user_registry.id
-        error = HeroNotUniqueError(
-            user_id, create_hero_dto.name, create_hero_dto.nickname
-        )
+        error = HeroNotUniqueError()
         hero_repo.persist.side_effect = error
 
-        assert await hero_repo.persist.called_once_with(create_hero_dto, user_id)
         with pytest.raises(HeroNotUniqueError):
             await hero_service.create(hero_repo, user_registry, create_hero_dto)
+        assert await hero_repo.persist.called_once_with(create_hero_dto, user_id)
 
 
 @pytest.mark.unit
@@ -138,3 +136,16 @@ class TestUpdate:
             update_hero_dto, user_id, hero.id
         )
         assert result is None
+
+    async def test_conflict(self, hero_repo, user_registry, hero, update_hero_dto):
+        id_ = hero.id
+        user_id = user_registry.id
+        error = HeroNotUniqueError()
+        hero_repo.update.side_effect = error
+
+        with pytest.raises(HeroNotUniqueError):
+            await hero_service.update(hero_repo, user_registry, update_hero_dto, id_)
+
+        assert await hero_repo.update.called_once_with(
+            update_hero_dto, user_id, hero.id
+        )

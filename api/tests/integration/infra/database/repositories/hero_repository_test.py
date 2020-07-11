@@ -197,3 +197,21 @@ class TestUpdate:
 
         async with database.transaction():
             assert not await hero_repository.update(user_id, dto, id_)
+
+    async def test_hero_not_unique_error(
+        self, database, make_user, make_hero, make_update_hero_dto
+    ):
+        user = make_user()
+        insert_user(user.dict())
+
+        id_ = 1
+        user_id = user.id
+        hero = make_hero(id=id_, user_id=user_id)
+        other_hero = make_hero(user_id=user_id)
+        insert_hero([hero.dict(), other_hero.dict()])
+
+        dto = make_update_hero_dto(name=other_hero.name, nickname=other_hero.nickname)
+
+        async with database.transaction():
+            with pytest.raises(HeroNotUniqueError):
+                await hero_repository.update(user_id, dto, id_)
