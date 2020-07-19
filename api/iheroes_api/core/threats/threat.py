@@ -15,7 +15,7 @@ class DangerLevel(str, Enum):
     GOD = "god"
 
 
-class Record(BaseModel):
+class ThreatRecord(BaseModel):
     class Config:
         allow_mutation = False
 
@@ -31,10 +31,10 @@ class Threat(BaseModel):
     name: str
     danger_level: DangerLevel
     location: Location
-    history: List[Record]
+    history: List[ThreatRecord]
 
     @validator("history")
-    def history_must_contain_latest_entry(cls, v, values):
+    def history_must_contain_latest_entry(cls, v, values):  # noqa: N805
         try:
             danger_level, location = itemgetter("danger_level", "location")(values)
         except KeyError:

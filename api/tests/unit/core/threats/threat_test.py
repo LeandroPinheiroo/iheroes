@@ -4,7 +4,12 @@ import pytest
 from pydantic import ValidationError
 from toolz import assoc, dissoc
 
-from iheroes_api.core.threats.threat import DangerLevel, Record, ReportThreatDto, Threat
+from iheroes_api.core.threats.threat import (
+    DangerLevel,
+    ReportThreatDto,
+    Threat,
+    ThreatRecord,
+)
 from tests.utils.asserts import assert_validation_error
 
 
@@ -87,17 +92,17 @@ class TestDangerLevel:
 
 
 @pytest.mark.unit
-class TestRecord:
+class TestThreatRecord:
     class TestModel:
         def test_validation(self, valid_record):
-            assert Record(**valid_record)
+            assert ThreatRecord(**valid_record)
 
         def test_invalidation(self, invalid_record):
             with pytest.raises(ValidationError):
-                Record(**invalid_record)
+                ThreatRecord(**invalid_record)
 
         def test_immutability(self, valid_record):
-            entity = Record(**valid_record)
+            entity = ThreatRecord(**valid_record)
             for key in entity.dict().keys():
                 with pytest.raises(TypeError):
                     setattr(entity, key, "some value")
@@ -107,13 +112,13 @@ class TestRecord:
 
         def test_must_be_danger_level(self, valid_record):
             with pytest.raises(ValidationError) as excinfo:
-                Record(**{**valid_record, "danger_level": 9000})
+                ThreatRecord(**{**valid_record, "danger_level": 9000})
 
             self.assert_validation_error("type_error.enum", excinfo)
 
         def test_is_required(self, valid_record):
             with pytest.raises(ValidationError) as excinfo:
-                Record(**dissoc(valid_record, "danger_level"))
+                ThreatRecord(**dissoc(valid_record, "danger_level"))
 
             self.assert_validation_error("value_error.missing", excinfo)
 
@@ -122,7 +127,7 @@ class TestRecord:
 
         def test_is_required(self, valid_record):
             with pytest.raises(ValidationError) as excinfo:
-                Record(**dissoc(valid_record, "location"))
+                ThreatRecord(**dissoc(valid_record, "location"))
 
             self.assert_validation_error("value_error.missing", excinfo)
 

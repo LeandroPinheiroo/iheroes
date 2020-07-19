@@ -2,7 +2,7 @@ from faker import Faker
 from faker.providers import BaseProvider
 from passlib.hash import argon2
 
-from iheroes_api.core.heroes.hero import Location
+from iheroes_api.core.common.location import Location
 
 fake = Faker()
 

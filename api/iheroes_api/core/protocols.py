@@ -2,6 +2,7 @@ from typing import Iterable, Optional, Protocol
 
 from iheroes_api.core.accounts.user import User
 from iheroes_api.core.heroes.hero import CreateHeroDto, Hero, UpdateHeroDto
+from iheroes_api.core.threats.threat import Threat, ReportThreatDto
 
 
 class HeroRepo(Protocol):
@@ -23,6 +24,11 @@ class HeroRepo(Protocol):
     async def update(
         self, user_id: int, dto: UpdateHeroDto, id_: int
     ) -> Optional[Hero]:
+        ...
+
+
+class ThreatRepo(Protocol):
+    async def upsert(self, dto: ReportThreatDto) -> Threat:
         ...
 
 
