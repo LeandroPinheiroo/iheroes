@@ -2,15 +2,26 @@ from functools import partial
 
 import pytest
 from pydantic import ValidationError
-from toolz import dissoc
+from toolz import assoc, dissoc
 
-from iheroes_api.core.threats.threat import (
-    CreateThreatDto,
-    DangerLevel,
-    Threat,
-    UpdateThreatDto,
-)
+from iheroes_api.core.threats.threat import DangerLevel, Record, ReportThreatDto, Threat
 from tests.utils.asserts import assert_validation_error
+
+
+@pytest.fixture(name="valid_record")
+def valid_record_fixture():
+    return {
+        "danger_level": "god",
+        "location": {"lat": 40.6971494, "lng": -74.2598771},
+    }
+
+
+@pytest.fixture(name="invalid_record")
+def invalid_record_fixture():
+    return {
+        "danger_level": "platinum",
+        "location": {"latitude": "some lat", "longitude": "some lng"},
+    }
 
 
 @pytest.fixture(name="valid_threat")
@@ -20,6 +31,12 @@ def valid_threat_fixture():
         "name": "Terrorblade",
         "danger_level": "god",
         "location": {"lat": 40.6971494, "lng": -74.2598771},
+        "history": [
+            {
+                "danger_level": "god",
+                "location": {"lat": 40.6971494, "lng": -74.2598771},
+            },
+        ],
     }
 
 
@@ -30,11 +47,12 @@ def invalid_threat_fixture():
         "name": ["Doombringer"],
         "danger_level": "Demon",
         "location": {"latitude": "some lat", "longitude": "some lng"},
+        "history": {},
     }
 
 
-@pytest.fixture(name="valid_create_threat_dto")
-def valid_create_threat_dto_fixture():
+@pytest.fixture(name="valid_report_threat_dto")
+def valid_report_threat_dto_fixture():
     return {
         "name": "Davion",
         "danger_level": "dragon",
@@ -42,27 +60,11 @@ def valid_create_threat_dto_fixture():
     }
 
 
-@pytest.fixture(name="invalid_create_threat_dto")
-def invalid_create_threat_dto_fixture():
+@pytest.fixture(name="invalid_report_threat_dto")
+def invalid_report_threat_dto_fixture():
     return {
         "name": "Banehallow",
         "danger_level": "hero",
-        "location": {"latitude": "some lat", "longitude": "some lng"},
-    }
-
-
-@pytest.fixture(name="valid_update_threat_dto")
-def valid_update_threat_dto_fixture():
-    return {
-        "danger_level": "tiger",
-        "location": {"lat": 40.6971494, "lng": -74.2598771},
-    }
-
-
-@pytest.fixture(name="invalid_update_threat_dto")
-def invalid_update_threat_dto_fixture():
-    return {
-        "danger_level": "champion",
         "location": {"latitude": "some lat", "longitude": "some lng"},
     }
 
@@ -82,6 +84,47 @@ class TestDangerLevel:
                 ValueError, match=f"'{value}' is not a valid DangerLevel"
             ):
                 DangerLevel(value)
+
+
+@pytest.mark.unit
+class TestRecord:
+    class TestModel:
+        def test_validation(self, valid_record):
+            assert Record(**valid_record)
+
+        def test_invalidation(self, invalid_record):
+            with pytest.raises(ValidationError):
+                Record(**invalid_record)
+
+        def test_immutability(self, valid_record):
+            entity = Record(**valid_record)
+            for key in entity.dict().keys():
+                with pytest.raises(TypeError):
+                    setattr(entity, key, "some value")
+
+    class TestDangerLevel:
+        assert_validation_error = partial(assert_validation_error, 1, "danger_level")
+
+        def test_must_be_danger_level(self, valid_record):
+            with pytest.raises(ValidationError) as excinfo:
+                Record(**{**valid_record, "danger_level": 9000})
+
+            self.assert_validation_error("type_error.enum", excinfo)
+
+        def test_is_required(self, valid_record):
+            with pytest.raises(ValidationError) as excinfo:
+                Record(**dissoc(valid_record, "danger_level"))
+
+            self.assert_validation_error("value_error.missing", excinfo)
+
+    class TestLocation:
+        assert_validation_error = partial(assert_validation_error, 1, "location")
+
+        def test_is_required(self, valid_record):
+            with pytest.raises(ValidationError) as excinfo:
+                Record(**dissoc(valid_record, "location"))
+
+            self.assert_validation_error("value_error.missing", excinfo)
 
 
 @pytest.mark.unit
@@ -131,42 +174,68 @@ class TestThreat:
             self.assert_validation_error("value_error.missing", excinfo)
 
     class TestDangerLevel:
-        assert_validation_error = partial(assert_validation_error, 1, "danger_level")
-
-        def test_must_be_power_class(self, valid_threat):
+        def test_must_be_danger_level(self, valid_threat):
             with pytest.raises(ValidationError) as excinfo:
                 Threat(**{**valid_threat, "danger_level": 9000})
 
-            self.assert_validation_error("type_error.enum", excinfo)
+            errors = excinfo.value.errors()
+            assert len(errors) == 2
+            error, *_ = [error for error in errors if error["loc"] == ("danger_level",)]
+            assert error["type"] == "type_error.enum"
 
         def test_is_required(self, valid_threat):
             with pytest.raises(ValidationError) as excinfo:
                 Threat(**dissoc(valid_threat, "danger_level"))
 
-            self.assert_validation_error("value_error.missing", excinfo)
+            errors = excinfo.value.errors()
+            assert len(errors) == 2
+            error, *_ = [error for error in errors if error["loc"] == ("danger_level",)]
+            assert error["type"] == "value_error.missing"
 
     class TestLocation:
-        assert_validation_error = partial(assert_validation_error, 1, "location")
-
         def test_is_required(self, valid_threat):
             with pytest.raises(ValidationError) as excinfo:
                 Threat(**dissoc(valid_threat, "location"))
 
+            errors = excinfo.value.errors()
+            assert len(errors) == 2
+            error, *_ = [error for error in errors if error["loc"] == ("location",)]
+            assert error["type"] == "value_error.missing"
+
+    class TestHistory:
+        assert_validation_error = partial(assert_validation_error, 1, "history")
+
+        def test_is_required(self, valid_threat):
+            with pytest.raises(ValidationError) as excinfo:
+                Threat(**dissoc(valid_threat, "history"))
+
             self.assert_validation_error("value_error.missing", excinfo)
+
+        def test_must_be_list(self, valid_threat):
+            with pytest.raises(ValidationError) as excinfo:
+                Threat(**{**valid_threat, "history": {}})
+
+            self.assert_validation_error("type_error.list", excinfo)
+
+        def test_must_contain_latest_entr(self, valid_threat):
+            with pytest.raises(ValidationError) as excinfo:
+                Threat(**assoc(valid_threat, "history", []))
+
+            self.assert_validation_error("value_error.list.entry_not_found", excinfo)
 
 
 @pytest.mark.unit
-class TestCreateThreatDto:
+class TestReportThreatDto:
     class TestModel:
-        def test_validation(self, valid_create_threat_dto):
-            assert CreateThreatDto(**valid_create_threat_dto)
+        def test_validation(self, valid_report_threat_dto):
+            assert ReportThreatDto(**valid_report_threat_dto)
 
-        def test_invalidation(self, invalid_create_threat_dto):
+        def test_invalidation(self, invalid_report_threat_dto):
             with pytest.raises(ValidationError):
-                CreateThreatDto(**invalid_create_threat_dto)
+                ReportThreatDto(**invalid_report_threat_dto)
 
-        def test_immutability(self, valid_create_threat_dto):
-            entity = CreateThreatDto(**valid_create_threat_dto)
+        def test_immutability(self, valid_report_threat_dto):
+            entity = ReportThreatDto(**valid_report_threat_dto)
             for key in entity.dict().keys():
                 with pytest.raises(TypeError):
                     setattr(entity, key, "some value")
@@ -174,79 +243,38 @@ class TestCreateThreatDto:
     class TestName:
         assert_validation_error = partial(assert_validation_error, 1, "name")
 
-        def test_must_be_str(self, valid_create_threat_dto):
+        def test_must_be_str(self, valid_report_threat_dto):
             with pytest.raises(ValidationError) as excinfo:
-                CreateThreatDto(**{**valid_create_threat_dto, "name": ["Some name"]})
+                ReportThreatDto(**{**valid_report_threat_dto, "name": ["Some name"]})
 
             self.assert_validation_error("type_error.str", excinfo)
 
-        def test_is_required(self, valid_create_threat_dto):
+        def test_is_required(self, valid_report_threat_dto):
             with pytest.raises(ValidationError) as excinfo:
-                CreateThreatDto(**dissoc(valid_create_threat_dto, "name"))
+                ReportThreatDto(**dissoc(valid_report_threat_dto, "name"))
 
             self.assert_validation_error("value_error.missing", excinfo)
 
     class TestDangerLevel:
         assert_validation_error = partial(assert_validation_error, 1, "danger_level")
 
-        def test_must_be_power_class(self, valid_create_threat_dto):
+        def test_must_be_danger_level(self, valid_report_threat_dto):
             with pytest.raises(ValidationError) as excinfo:
-                CreateThreatDto(**{**valid_create_threat_dto, "danger_level": 9000})
+                ReportThreatDto(**{**valid_report_threat_dto, "danger_level": 9000})
 
             self.assert_validation_error("type_error.enum", excinfo)
 
-        def test_is_required(self, valid_create_threat_dto):
+        def test_is_required(self, valid_report_threat_dto):
             with pytest.raises(ValidationError) as excinfo:
-                CreateThreatDto(**dissoc(valid_create_threat_dto, "danger_level"))
+                ReportThreatDto(**dissoc(valid_report_threat_dto, "danger_level"))
 
             self.assert_validation_error("value_error.missing", excinfo)
 
     class TestLocation:
         assert_validation_error = partial(assert_validation_error, 1, "location")
 
-        def test_is_required(self, valid_create_threat_dto):
+        def test_is_required(self, valid_report_threat_dto):
             with pytest.raises(ValidationError) as excinfo:
-                CreateThreatDto(**dissoc(valid_create_threat_dto, "location"))
-
-            self.assert_validation_error("value_error.missing", excinfo)
-
-
-@pytest.mark.unit
-class TestUpdateThreatDto:
-    class TestModel:
-        def test_validation(self, valid_update_threat_dto):
-            assert UpdateThreatDto(**valid_update_threat_dto)
-
-        def test_invalidation(self, invalid_update_threat_dto):
-            with pytest.raises(ValidationError):
-                UpdateThreatDto(**invalid_update_threat_dto)
-
-        def test_immutability(self, valid_update_threat_dto):
-            entity = UpdateThreatDto(**valid_update_threat_dto)
-            for key in entity.dict().keys():
-                with pytest.raises(TypeError):
-                    setattr(entity, key, "some value")
-
-    class TestDangerLevel:
-        assert_validation_error = partial(assert_validation_error, 1, "danger_level")
-
-        def test_must_be_power_class(self, valid_update_threat_dto):
-            with pytest.raises(ValidationError) as excinfo:
-                UpdateThreatDto(**{**valid_update_threat_dto, "danger_level": 9000})
-
-            self.assert_validation_error("type_error.enum", excinfo)
-
-        def test_is_required(self, valid_update_threat_dto):
-            with pytest.raises(ValidationError) as excinfo:
-                UpdateThreatDto(**dissoc(valid_update_threat_dto, "danger_level"))
-
-            self.assert_validation_error("value_error.missing", excinfo)
-
-    class TestLocation:
-        assert_validation_error = partial(assert_validation_error, 1, "location")
-
-        def test_is_required(self, valid_update_threat_dto):
-            with pytest.raises(ValidationError) as excinfo:
-                UpdateThreatDto(**dissoc(valid_update_threat_dto, "location"))
+                ReportThreatDto(**dissoc(valid_report_threat_dto, "location"))
 
             self.assert_validation_error("value_error.missing", excinfo)
