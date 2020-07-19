@@ -3,6 +3,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
+from iheroes_api.core.common.location import Location
+
 # Typedefs
 Name = Field("Unknown", min_length=1, max_length=100)
 OptionalName = Field("Unknown", min_length=1, max_length=100)
@@ -16,14 +18,6 @@ class PowerClass(str, Enum):
     A = "A"
     B = "B"
     C = "C"
-
-
-class Location(BaseModel):
-    class Config:
-        allow_mutation = False
-
-    lat: float
-    lng: float
 
 
 class Hero(BaseModel):
