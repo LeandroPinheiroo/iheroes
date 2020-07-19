@@ -1,17 +1,17 @@
 from datetime import datetime
 
-from sqlalchemy.schema import Column, Table
+from sqlalchemy.schema import Column, ForeignKey, Table
 from sqlalchemy.sql.expression import text
-from sqlalchemy.types import JSON, DateTime, Integer, Text
+from sqlalchemy.types import JSON, DateTime, Integer
 
-from iheroes_api.infra.database.models import DangerLevelEnum
+from iheroes_api.infra.database.models import DangerLevelEnum, Threat
 from iheroes_api.infra.database.sqlalchemy import metadata
 
-Threat = Table(
-    "threat",
+ThreatRecord = Table(
+    "threat_record",
     metadata,
     Column("id", Integer, primary_key=True),
-    Column("name", Text, nullable=False, unique=True),
+    Column("threat_id", Integer, ForeignKey(Threat.c.id), nullable=False),
     Column("danger_level", DangerLevelEnum, nullable=False),
     Column("location", JSON, nullable=False),
     Column(
@@ -21,5 +21,4 @@ Threat = Table(
         server_default=text("NOW()"),
         nullable=False,
     ),
-    Column("updated_at", DateTime, onupdate=datetime.now, nullable=True),
 )
