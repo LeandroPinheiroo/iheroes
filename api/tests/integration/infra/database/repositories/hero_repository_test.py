@@ -16,16 +16,6 @@ for factory in factories:
     register(factory)
 
 
-@pytest.fixture(name="make_create_hero_dto")
-def make_create_hero_dto_fixture(create_hero_dto_factory):
-    return lambda **override: create_hero_dto_factory(**override)
-
-
-@pytest.fixture(name="make_update_hero_dto")
-def make_update_hero_dto_fixture(update_hero_dto_factory):
-    return lambda **override: update_hero_dto_factory(**override)
-
-
 @pytest.mark.integration
 @pytest.mark.asyncio
 class TestDelete:
@@ -136,11 +126,11 @@ async def test_fetch_all_by_user(database, make_user, make_heroes):
 @pytest.mark.integration
 @pytest.mark.asyncio
 class TestPersist:
-    async def test_success(self, database, make_user, make_create_hero_dto):
+    async def test_success(self, database, make_user, create_hero_dto_factory):
         user = make_user()
         insert_user(user.dict())
 
-        dto = make_create_hero_dto()
+        dto = create_hero_dto_factory()
 
         async with database.transaction():
             result = await hero_repository.persist(user.id, dto)
@@ -150,7 +140,7 @@ class TestPersist:
         ) == (user.id, *attrgetter("name", "nickname", "power_class", "location")(dto))
 
     async def test_hero_not_unique_error(
-        self, database, make_user, make_hero, make_create_hero_dto
+        self, database, make_user, make_hero, create_hero_dto_factory
     ):
         user = make_user()
         insert_user(user.dict())
@@ -160,7 +150,7 @@ class TestPersist:
         hero = make_hero(id=id_, user_id=user_id)
         insert_hero(hero.dict())
 
-        dto = make_create_hero_dto()
+        dto = create_hero_dto_factory()
 
         async with database.transaction():
             with pytest.raises(HeroNotUniqueError):
@@ -170,7 +160,7 @@ class TestPersist:
 @pytest.mark.integration
 @pytest.mark.asyncio
 class TestUpdate:
-    async def test_found(self, database, make_user, make_hero, make_update_hero_dto):
+    async def test_found(self, database, make_user, make_hero, update_hero_dto_factory):
         user = make_user()
         insert_user(user.dict())
 
@@ -179,7 +169,7 @@ class TestUpdate:
         hero = make_hero(id=id_, user_id=user_id)
         insert_hero(hero.dict())
 
-        dto = make_update_hero_dto()
+        dto = update_hero_dto_factory()
 
         async with database.transaction():
             result = await hero_repository.update(user_id, dto, id_)
@@ -190,16 +180,16 @@ class TestUpdate:
         getter = attrgetter("name", "nickname", "power_class", "location")
         assert getter(result) != getter(hero)
 
-    async def test_not_found(self, database, make_update_hero_dto):
+    async def test_not_found(self, database, update_hero_dto_factory):
         id_ = 1
         user_id = 1
-        dto = make_update_hero_dto
+        dto = update_hero_dto_factory
 
         async with database.transaction():
             assert not await hero_repository.update(user_id, dto, id_)
 
     async def test_hero_not_unique_error(
-        self, database, make_user, make_hero, make_update_hero_dto
+        self, database, make_user, make_hero, update_hero_dto_factory
     ):
         user = make_user()
         insert_user(user.dict())
@@ -210,7 +200,9 @@ class TestUpdate:
         other_hero = make_hero(user_id=user_id)
         insert_hero([hero.dict(), other_hero.dict()])
 
-        dto = make_update_hero_dto(name=other_hero.name, nickname=other_hero.nickname)
+        dto = update_hero_dto_factory(
+            name=other_hero.name, nickname=other_hero.nickname
+        )
 
         async with database.transaction():
             with pytest.raises(HeroNotUniqueError):
