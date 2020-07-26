@@ -21,7 +21,7 @@ for factory in factories:
     register(factory)
 
 
-@pytest.fixture(name="database")
+@pytest.fixture(name="database", autouse=True)
 async def database_fixture():
     with clear_database():
         await connect_database()

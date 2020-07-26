@@ -7,6 +7,7 @@ from iheroes_api.core.threats.threat import (
     ReportThreatDto,
     Threat,
     ThreatRecord,
+    ThreatHistory,
 )
 from tests.factories.providers import LocationProvider, PasswordHashProvider
 
@@ -87,14 +88,6 @@ DangerLevelFactory = factory.Faker(
 )
 
 
-class ThreatRecordFactory(factory.Factory):
-    class Meta:
-        model = ThreatRecord
-
-    danger_level = DangerLevelFactory
-    location = factory.Faker("location")
-
-
 class ThreatFactory(factory.Factory):
     class Meta:
         model = Threat
@@ -103,6 +96,21 @@ class ThreatFactory(factory.Factory):
     name = factory.Faker("name")
     danger_level = DangerLevelFactory
     location = factory.Faker("location")
+
+
+class ThreatRecordFactory(factory.Factory):
+    class Meta:
+        model = ThreatRecord
+
+    danger_level = DangerLevelFactory
+    location = factory.Faker("location")
+
+
+class ThreatHistoryFactory(factory.Factory):
+    class Meta:
+        model = ThreatHistory
+
+    threat_id = factory.Faker("pyint", min_value=0)
     history = factory.LazyAttribute(
         lambda o: [
             ThreatRecordFactory(danger_level=o.danger_level, location=o.location)
