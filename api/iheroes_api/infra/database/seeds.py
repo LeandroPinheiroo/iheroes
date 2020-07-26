@@ -2,15 +2,15 @@ import logging
 from typing import Any, Dict, Iterable
 
 from databases import Database
-from sqlalchemy.schema import Table
 
 from iheroes_api.core.accounts import hash_service
-from iheroes_api.infra.database.models import Hero, User
+from iheroes_api.infra.database.models import Hero, Threat, ThreatRecord, User
 from iheroes_api.infra.database.sqlalchemy import (
     database_context,
     init_database,
     truncate_database,
 )
+from sqlalchemy.schema import Table
 
 logger = logging.getLogger(__name__)
 
@@ -153,8 +153,60 @@ async def _populate_heroes(db: Database) -> None:
     await _populate_table(db, Hero, values)
 
 
+async def _populate_threats(db: Database) -> None:
+    values = [
+        {
+            "name": "Deathstroke",
+            "danger_level": "wolf",
+            "location": {"lat": 40.743861, "lng": -73.976836},
+        },
+        {
+            "name": "Joker",
+            "danger_level": "tiger",
+            "location": {"lat": 39.833851, "lng": -74.871826},
+        },
+        {
+            "name": "Darkseid",
+            "danger_level": "dragon",
+            "location": {"lat": 38.900497, "lng": -77.007507},
+        },
+        {
+            "name": "Anti-monitor",
+            "danger_level": "god",
+            "location": {"lat": 37.773972, "lng": -122.431297},
+        },
+    ]
+    await _populate_table(db, Threat, values)
+
+
+async def _populate_threat_records(db: Database) -> None:
+    values = [
+        {
+            "threat_id": 1,
+            "danger_level": "wolf",
+            "location": {"lat": 40.743861, "lng": -73.976836},
+        },
+        {
+            "threat_id": 2,
+            "danger_level": "tiger",
+            "location": {"lat": 39.833851, "lng": -74.871826},
+        },
+        {
+            "threat_id": 3,
+            "danger_level": "dragon",
+            "location": {"lat": 38.900497, "lng": -77.007507},
+        },
+        {
+            "threat_id": 4,
+            "danger_level": "god",
+            "location": {"lat": 37.773972, "lng": -122.431297},
+        },
+    ]
+    await _populate_table(db, ThreatRecord, values)
+
+
 # Runner
-seeds = [_populate_user, _populate_heroes]
+seeds = [_populate_user, _populate_heroes, _populate_threats, _populate_threat_records]
 
 
 async def run() -> None:
