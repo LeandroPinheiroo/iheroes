@@ -8,7 +8,7 @@ from tests.utils.database import clear_database
 
 @pytest.fixture(name="env_settings")
 def env_settings():
-    return get_settings()
+    return get_settings().copy(update={"ENV": "testing"})
 
 
 @pytest.fixture(name="web_app")
