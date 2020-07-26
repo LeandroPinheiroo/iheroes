@@ -32,7 +32,7 @@ def upgrade():
         ),
         sa.Column("location", sa.JSON(), nullable=False),
         sa.Column(
-            "created_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False
+            "created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
         ),
         sa.ForeignKeyConstraint(
             ["threat_id"], ["threat.id"], name=op.f("fk_threat_record_threat_id_threat")

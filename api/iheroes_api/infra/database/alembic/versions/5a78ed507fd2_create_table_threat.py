@@ -5,8 +5,8 @@ Revises: 394a7cf4bd00
 Create Date: 2020-07-19 22:50:33.254129
 
 """
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
@@ -28,7 +28,7 @@ def upgrade():
         ),
         sa.Column("location", sa.JSON(), nullable=False),
         sa.Column(
-            "created_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False
+            "created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
         ),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_threat")),

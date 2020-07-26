@@ -1,7 +1,5 @@
-from datetime import datetime
-
+from sqlalchemy import func
 from sqlalchemy.schema import Column, Table
-from sqlalchemy.sql.expression import text
 from sqlalchemy.types import JSON, DateTime, Integer, Text
 
 from iheroes_api.infra.database.models import DangerLevelEnum
@@ -17,9 +15,15 @@ Threat = Table(
     Column(
         "created_at",
         DateTime,
-        default=datetime.now,
-        server_default=text("NOW()"),
+        default=func.now(),
+        server_default=func.now(),
         nullable=False,
     ),
-    Column("updated_at", DateTime, onupdate=datetime.now, nullable=True),
+    Column(
+        "updated_at",
+        DateTime,
+        onupdate=func.now(),
+        server_onupdate=func.now(),
+        nullable=True,
+    ),
 )
