@@ -27,7 +27,7 @@ services:
         JWT_ACCESS_TOKEN_EXPIRE_MINUTES: 60
         JWT_ALGORITHM: "HS256"
         JWT_SECRET_KEY: "f50c515c3bd3c2155f51e79a90dc9b6721415427c73cc9e4ac3145afed92d292"
-        LISTENER_URL: https://zrp-challenge-socket.herokuapp.com:443
+        LISTENER_URL: "https://zrp-challenge-socket.herokuapp.com:443"
         WEB_APP_DEBUG: "true"
         WEB_APP_DESCRIPTION: "iHeroes Threat Manager API"
         WEB_APP_TITLE: "iHeroes"
@@ -63,6 +63,7 @@ services:
         ENV: "testing"
         HYPOTHESIS_PROFILE: "testing"
         DATABASE_PG_URL: "postgresql://postgres:dev1234@pgsql-db/iheroes-test"
+        LISTENER_URL: "localhost:8001"
       depends_on:
         - pgsql-db
 
