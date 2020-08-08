@@ -17,6 +17,7 @@ python-multipart = "^0.0.5"
 toolz = "^0.10.0"
 uvicorn = "^0.11.5"
 python-socketio = {version = "^4.6.0", extras = ["asyncio_client"]}
+celery = "^4.4.7"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
