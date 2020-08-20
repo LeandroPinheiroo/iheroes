@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from iheroes_api.core.common.location import Location
 
 
+# Enums
 class DangerLevel(str, Enum):
     WOLF = "wolf"
     TIGER = "tiger"
@@ -13,6 +14,7 @@ class DangerLevel(str, Enum):
     GOD = "god"
 
 
+# Entities
 class Threat(BaseModel):
     class Config:
         allow_mutation = False
