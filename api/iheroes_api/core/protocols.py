@@ -2,7 +2,7 @@ from typing import Iterable, Optional, Protocol
 
 from iheroes_api.core.accounts.user import User
 from iheroes_api.core.heroes.hero import CreateHeroDto, Hero, UpdateHeroDto
-from iheroes_api.core.threats.threat import Threat, ReportThreatDto
+from iheroes_api.core.threats.threat import ReportThreatDto, Threat
 
 
 class HeroRepo(Protocol):
@@ -29,6 +29,14 @@ class HeroRepo(Protocol):
 
 class ThreatRepo(Protocol):
     async def upsert(self, dto: ReportThreatDto) -> Threat:
+        ...
+
+    async def create_pending_occurrence(self, threat: Threat) -> Threat:
+        ...
+
+
+class ThreatMonitor(Protocol):
+    async def start_monitoring(self, threat: Threat) -> Threat:
         ...
 
 

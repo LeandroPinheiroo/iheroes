@@ -2,12 +2,13 @@ import factory
 
 from iheroes_api.core.accounts.user import Credentials, User, UserRegistry
 from iheroes_api.core.heroes.hero import CreateHeroDto, Hero, PowerClass, UpdateHeroDto
+from iheroes_api.core.threats.occurrence import Occurrence, State
 from iheroes_api.core.threats.threat import (
     DangerLevel,
     ReportThreatDto,
     Threat,
-    ThreatRecord,
     ThreatHistory,
+    ThreatRecord,
 )
 from tests.factories.providers import LocationProvider, PasswordHashProvider
 
@@ -82,6 +83,22 @@ class UpdateHeroDtoFactory(factory.Factory):
     location = factory.Faker("location")
 
 
+# Occurrence
+OccurrenceStateFactory = factory.Faker(
+    "random_element", elements=[e.value for e in State]
+)
+
+
+class OccurrenceFactory(factory.Factory):
+    class Meta:
+        model = Occurrence
+
+    id = factory.Faker("pyint", min_value=0)  # noqa: A003
+    state = OccurrenceStateFactory
+    created_at = factory.Faker("date_time")
+    updated_at = factory.Faker("date_time")
+
+
 # Threat
 DangerLevelFactory = factory.Faker(
     "random_element", elements=[e.value for e in DangerLevel]
@@ -96,6 +113,13 @@ class ThreatFactory(factory.Factory):
     name = factory.Faker("name")
     danger_level = DangerLevelFactory
     location = factory.Faker("location")
+    occurrences = factory.LazyAttribute(
+        lambda o: [
+            OccurrenceFactory(state="resolved").dict(),
+            OccurrenceFactory(state="resolved").dict(),
+            OccurrenceFactory(state="active").dict(),
+        ]
+    )
 
 
 class ThreatRecordFactory(factory.Factory):

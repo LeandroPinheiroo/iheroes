@@ -1,8 +1,9 @@
+from datetime import datetime
 from functools import partial
 
 import pytest
 from pydantic import ValidationError
-from toolz import dissoc
+from toolz import assoc, dissoc
 
 from iheroes_api.core.threats.threat import (
     DangerLevel,
@@ -14,13 +15,26 @@ from iheroes_api.core.threats.threat import (
 from tests.utils.asserts import assert_validation_error
 
 
+@pytest.fixture(name="valid_occurrences")
+def valid_occurrences_fixture():
+    return [
+        {
+            "id": 1,
+            "state": "active",
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+        }
+    ]
+
+
 @pytest.fixture(name="valid_threat")
-def valid_threat_fixture():
+def valid_threat_fixture(valid_occurrences):
     return {
         "id": 1,
         "name": "Terrorblade",
         "danger_level": "god",
         "location": {"lat": 40.6971494, "lng": -74.2598771},
+        "occurrences": valid_occurrences,
     }
 
 
@@ -31,6 +45,7 @@ def invalid_threat_fixture():
         "name": ["Doombringer"],
         "danger_level": "Demon",
         "location": {"latitude": "some lat", "longitude": "some lng"},
+        "occurrences": "some occurrence",
     }
 
 
@@ -67,7 +82,7 @@ def valid_history_fixture():
 def invalid_history_fixture():
     return {
         "threat_id": "some id",
-        "records": "some list",
+        "records": "some sequence",
     }
 
 
@@ -180,11 +195,11 @@ class TestThreatHistory:
     class TestRecords:
         assert_validation_error = partial(assert_validation_error, 1, "records")
 
-        def test_must_be_list(self, valid_history):
+        def test_must_be_sequence(self, valid_history):
             with pytest.raises(ValidationError) as excinfo:
-                ThreatHistory(**{**valid_history, "records": "some list"})
+                ThreatHistory(**assoc(valid_history, "records", "some sequence"))
 
-            self.assert_validation_error("type_error.list", excinfo)
+            self.assert_validation_error("type_error.sequence", excinfo)
 
         def test_is_required(self, valid_history):
             with pytest.raises(ValidationError) as excinfo:
@@ -262,6 +277,122 @@ class TestThreat:
                 Threat(**dissoc(valid_threat, "location"))
 
             self.assert_validation_error("value_error.missing", excinfo)
+
+    class TestOccurrences:
+        assert_validation_error = partial(assert_validation_error, 1, "occurrences")
+
+        def test_is_required(self, valid_threat):
+            with pytest.raises(ValidationError) as excinfo:
+                Threat(**dissoc(valid_threat, "occurrences"))
+
+            self.assert_validation_error("value_error.missing", excinfo)
+
+        def test_is_sequence(self, valid_threat):
+            with pytest.raises(ValidationError) as excinfo:
+                Threat(
+                    **assoc(
+                        valid_threat,
+                        "occurrences",
+                        {
+                            "id": 1,
+                            "state": "resolved",
+                            "created_at": datetime.utcnow(),
+                            "updated_at": datetime.utcnow(),
+                        },
+                    )
+                )
+
+            self.assert_validation_error("type_error", excinfo)
+
+        def test_sorting_order(self, valid_threat):
+            threat = Threat(
+                **assoc(
+                    valid_threat,
+                    "occurrences",
+                    [
+                        {
+                            "id": 1,
+                            "state": "resolved",
+                            "created_at": datetime(2020, 1, 2),
+                            "updated_at": datetime(2020, 1, 2),
+                        },
+                        {
+                            "id": 2,
+                            "state": "resolved",
+                            "created_at": datetime(2020, 1, 1),
+                            "updated_at": datetime(2020, 1, 1),
+                        },
+                    ],
+                )
+            )
+            first, second = threat.occurrences
+            assert first.updated_at < second.updated_at
+
+        def test_only_one_monitored_state(self, valid_threat):
+            with pytest.raises(ValidationError) as excinfo:
+                Threat(
+                    **assoc(
+                        valid_threat,
+                        "occurrences",
+                        [
+                            {
+                                "id": 1,
+                                "state": "pending",
+                                "created_at": datetime(2020, 1, 2),
+                                "updated_at": datetime(2020, 1, 2),
+                            },
+                            {
+                                "id": 2,
+                                "state": "active",
+                                "created_at": datetime(2020, 1, 1),
+                                "updated_at": datetime(2020, 1, 1),
+                            },
+                        ],
+                    )
+                )
+
+            self.assert_validation_error("value_error", excinfo)
+
+    class TestIsBeingMonitored:
+        def test_false(self, valid_threat):
+            threat = Threat(**assoc(valid_threat, "occurrences", []))
+            assert threat.is_being_monitored() is False
+
+            threat = Threat(
+                **assoc(
+                    valid_threat,
+                    "occurrences",
+                    [
+                        {
+                            "id": 1,
+                            "state": "resolved",
+                            "created_at": datetime.utcnow(),
+                            "updated_at": datetime.utcnow(),
+                        }
+                    ],
+                )
+            )
+            assert threat.is_being_monitored() is False
+
+        def test_true(self, valid_threat):
+            states = ["pending", "active"]
+
+            for state in states:
+                threat = Threat(
+                    **assoc(
+                        valid_threat,
+                        "occurrences",
+                        [
+                            {
+                                "id": 1,
+                                "state": state,
+                                "created_at": datetime.utcnow(),
+                                "updated_at": datetime.utcnow(),
+                            }
+                        ],
+                    )
+                )
+                assert threat.is_being_monitored() is True
 
 
 @pytest.mark.unit

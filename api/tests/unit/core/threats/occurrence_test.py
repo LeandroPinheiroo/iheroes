@@ -1,3 +1,4 @@
+from datetime import datetime
 from functools import partial
 
 import pytest
@@ -10,12 +11,22 @@ from tests.utils.asserts import assert_validation_error
 
 @pytest.fixture(name="valid_occurrence")
 def valid_occurrence_fixture():
-    return {"id": 1, "state": "active"}
+    return {
+        "id": 1,
+        "state": "active",
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow(),
+    }
 
 
 @pytest.fixture(name="invalid_occurrence")
 def invalid_occurrence_fixture():
-    return {"id": "some id", "state": "some state"}
+    return {
+        "id": "some id",
+        "state": "some state",
+        "created_at": "some datetime",
+        "updated_at": "some datetime",
+    }
 
 
 @pytest.mark.unit
@@ -76,5 +87,35 @@ class TestOccurrence:
         def test_is_required(self, valid_occurrence):
             with pytest.raises(ValidationError) as excinfo:
                 Occurrence(**dissoc(valid_occurrence, "state"))
+
+            self.assert_validation_error("value_error.missing", excinfo)
+
+    class TestCreatedAt:
+        assert_validation_error = partial(assert_validation_error, 1, "created_at")
+
+        def test_must_be_datetime(self, valid_occurrence):
+            with pytest.raises(ValidationError) as excinfo:
+                Occurrence(**assoc(valid_occurrence, "created_at", "some datetime"))
+
+            self.assert_validation_error("value_error.datetime", excinfo)
+
+        def test_is_required(self, valid_occurrence):
+            with pytest.raises(ValidationError) as excinfo:
+                Occurrence(**dissoc(valid_occurrence, "created_at"))
+
+            self.assert_validation_error("value_error.missing", excinfo)
+
+    class TestUpdatedAt:
+        assert_validation_error = partial(assert_validation_error, 1, "updated_at")
+
+        def test_must_be_datetime(self, valid_occurrence):
+            with pytest.raises(ValidationError) as excinfo:
+                Occurrence(**assoc(valid_occurrence, "updated_at", "some datetime"))
+
+            self.assert_validation_error("value_error.datetime", excinfo)
+
+        def test_is_required(self, valid_occurrence):
+            with pytest.raises(ValidationError) as excinfo:
+                Occurrence(**dissoc(valid_occurrence, "updated_at"))
 
             self.assert_validation_error("value_error.missing", excinfo)

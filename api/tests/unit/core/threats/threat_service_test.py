@@ -1,24 +1,28 @@
 import pytest
 from pytest_factoryboy import register
+from toolz import assoc
 
-from iheroes_api.core.protocols import ThreatRepo
+from iheroes_api.core.protocols import ThreatMonitor, ThreatRepo
 from iheroes_api.core.threats import threat_service
-from tests.factories.entity_factories import ReportThreatDtoFactory, ThreatFactory
+from tests.factories.entity_factories import (
+    OccurrenceFactory,
+    ReportThreatDtoFactory,
+    ThreatFactory,
+)
 
-factories = [ReportThreatDtoFactory, ThreatFactory]
+factories = [
+    OccurrenceFactory,
+    ReportThreatDtoFactory,
+    ThreatFactory,
+]
 
 for factory in factories:
     register(factory)
 
 
-@pytest.fixture(name="make_threat")
-def threat_fixture(threat_factory):
-    return lambda **override: threat_factory(**override)
-
-
-@pytest.fixture(name="make_report_dto")
-def report_dto_fixture(report_threat_dto_factory):
-    return lambda **override: report_threat_dto_factory(**override)
+@pytest.fixture(name="threat_monitor")
+def threat_monitor_fixture(mock_module):
+    return mock_module("threat_monitor", ThreatMonitor)
 
 
 @pytest.fixture(name="threat_repo")
@@ -29,33 +33,65 @@ def threat_repo_fixture(mock_module):
 @pytest.mark.unit
 @pytest.mark.asyncio
 class TestReportThreat:
-    async def test_new_threat(self, threat_repo, make_threat, make_report_dto):
-        dto = make_report_dto()
-        threat = make_threat(
-            name=dto.name, danger_level=dto.danger_level, location=dto.location
+    async def test_unmonitored_threat(
+        self,
+        threat_monitor,
+        threat_repo,
+        occurrence_factory,
+        threat_factory,
+        report_threat_dto_factory,
+    ):
+        dto = report_threat_dto_factory()
+        threat = threat_factory(
+            name=dto.name,
+            danger_level=dto.danger_level,
+            location=dto.location,
+            occurrences=[occurrence_factory(state="resolved").dict()],
         )
-        threat_repo.upsert.return_value = threat
+        new_threat = threat_factory(
+            **assoc(
+                threat.dict(),
+                "occurrences",
+                [occurrence_factory(state="pending").dict()],
+            ),
+        )
 
-        result = await threat_service.report_threat(threat_repo, dto)
+        threat_repo.upsert.return_value = threat
+        threat_repo.create_pending_occurrence.return_value = new_threat
+        threat_monitor.start_monitoring.return_value = new_threat
+
+        result = await threat_service.report_threat(threat_monitor, threat_repo, dto)
 
         threat_repo.upsert.assert_called_once_with(dto)
-        assert result == threat
+        threat_repo.create_pending_occurrence.assert_called_once_with(threat)
+        threat_monitor.start_monitoring.assert_called_once_with(new_threat)
 
-    async def test_existing_threat(self, threat_repo, make_threat, make_report_dto):
+        assert result == new_threat
+        assert result.is_being_monitored() is True
+
+    async def test_monitored_threat(
+        self,
+        threat_monitor,
+        threat_repo,
+        occurrence_factory,
+        threat_factory,
+        report_threat_dto_factory,
+    ):
         name = "Darkterror"
-        dto = make_report_dto(name=name)
-        threat = make_threat(
+        dto = report_threat_dto_factory(name=name)
+        threat = threat_factory(
             name=name,
             danger_level=dto.danger_level,
             location=dto.location,
-            history=[
-                {"danger_level": "god", "location": {"lat": 10.0, "lng": 20.0}},
-                {"danger_level": dto.danger_level, "location": dto.location},
-            ],
+            occurrences=[occurrence_factory(state="pending").dict()],
         )
+
         threat_repo.upsert.return_value = threat
 
-        result = await threat_service.report_threat(threat_repo, dto)
+        result = await threat_service.report_threat(threat_monitor, threat_repo, dto)
 
         threat_repo.upsert.assert_called_once_with(dto)
+        assert not threat_repo.create_pending_occurrence.called
+        assert not threat_monitor.start_monitoring.called
         assert result == threat
+        assert result.is_being_monitored() is True
