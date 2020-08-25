@@ -4,7 +4,13 @@ from typing import Any, Dict, Iterable
 from databases import Database
 
 from iheroes_api.core.accounts import hash_service
-from iheroes_api.infra.database.models import Hero, Threat, ThreatRecord, User
+from iheroes_api.infra.database.models import (
+    Hero,
+    Occurrence,
+    Threat,
+    ThreatRecord,
+    User,
+)
 from iheroes_api.infra.database.sqlalchemy import (
     database_context,
     init_database,
@@ -205,8 +211,26 @@ async def _populate_threat_records(db: Database) -> None:
     await _populate_table(db, ThreatRecord, values)
 
 
+async def _populate_occurrences(db: Database) -> None:
+    values = [
+        {"threat_id": 1, "state": "resolved"},
+        {"threat_id": 1, "state": "resolved"},
+        {"threat_id": 2, "state": "resolved"},
+        {"threat_id": 2, "state": "resolved"},
+        {"threat_id": 3, "state": "resolved"},
+        {"threat_id": 3, "state": "resolved"},
+    ]
+    await _populate_table(db, Occurrence, values)
+
+
 # Runner
-seeds = [_populate_user, _populate_heroes, _populate_threats, _populate_threat_records]
+seeds = [
+    _populate_user,
+    _populate_heroes,
+    _populate_threats,
+    _populate_threat_records,
+    _populate_occurrences,
+]
 
 
 async def run() -> None:

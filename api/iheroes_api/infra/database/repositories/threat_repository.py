@@ -2,32 +2,58 @@ from typing import Optional
 
 from toolz import assoc
 
-from iheroes_api.core.threats.exceptions import ThreatNotFoundError
+from iheroes_api.core.threats.exceptions import (
+    ThreatMonitoredError,
+    ThreatNotFoundError,
+)
+from iheroes_api.core.threats.occurrence import State
 from iheroes_api.core.threats.threat import (
     ReportThreatDto,
     Threat,
     ThreatHistory,
     ThreatRecord,
 )
+from iheroes_api.infra.database.models import Occurrence as OccurrenceModel
 from iheroes_api.infra.database.models import Threat as ThreatModel
 from iheroes_api.infra.database.models import ThreatRecord as ThreatRecordModel
 from iheroes_api.infra.database.sqlalchemy import database
 
 
+async def create_pending_occurrence(threat: Threat) -> Threat:
+    if threat.is_being_monitored():
+        raise ThreatMonitoredError(threat)
+
+    initial_state = State.PENDING
+    query = OccurrenceModel.insert().values(threat_id=threat.id, state=initial_state)
+
+    await database.execute(query)
+    return await fetch_or_raise(threat.id)
+
+
 async def fetch_by_name(threat_name: str) -> Optional[Threat]:
     query = ThreatModel.select().where(ThreatModel.c.name == threat_name)
+    threat = await database.fetch_one(query)
 
-    result = await database.fetch_one(query)
-    return Threat.parse_obj(dict(result)) if result else None
+    if not threat:
+        return None
+
+    query = OccurrenceModel.select().where(OccurrenceModel.c.threat_id == threat["id"])
+    occurrences = await database.fetch_all(query)
+
+    return Threat.parse_obj(assoc(dict(threat), "occurrences", occurrences))
 
 
 async def fetch_or_raise(threat_id: int) -> Threat:
     query = ThreatModel.select().where(ThreatModel.c.id == threat_id)
+    threat = await database.fetch_one(query)
 
-    result = await database.fetch_one(query)
-    if not result:
+    if not threat:
         raise ThreatNotFoundError()
-    return Threat.parse_obj(dict(result))
+
+    query = OccurrenceModel.select().where(OccurrenceModel.c.threat_id == threat_id)
+    occurrences = await database.fetch_all(query)
+
+    return Threat.parse_obj(assoc(dict(threat), "occurrences", occurrences))
 
 
 async def fetch_history(threat_id: int) -> Optional[ThreatHistory]:
@@ -79,4 +105,4 @@ async def upsert(dto: ReportThreatDto) -> Threat:
         query = ThreatModel.insert().values(**values)
         last_record_id = await database.execute(query)
         await register_history_change(last_record_id, dto)
-        return Threat.parse_obj({**values, "id": last_record_id})
+        return Threat.parse_obj({**values, "id": last_record_id, "occurrences": ()})

@@ -20,7 +20,7 @@ for factory in factories:
 class TestFetchByName:
     async def test_found(self, database, threat_factory):
         name = "lina"
-        threat = threat_factory(name=name)
+        threat = threat_factory(name=name, occurrences=())
         insert_threat(threat.dict())
 
         result = await threat_repository.fetch_by_name(name)
@@ -84,7 +84,7 @@ class TestFetchHistoryOrRaise:
 class TestFetchOrRaise:
     async def test_found(self, database, threat_factory):
         id_ = 1
-        threat = threat_factory(id=id_)
+        threat = threat_factory(id=id_, occurrences=())
         insert_threat(threat.dict())
 
         result = await threat_repository.fetch_or_raise(id_)
