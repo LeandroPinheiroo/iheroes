@@ -6,7 +6,8 @@ from databases import Database
 from iheroes_api.api.modules.auth import build_auth_module
 from iheroes_api.api.protocols import AuthModule
 from iheroes_api.config.environment import get_settings
-from iheroes_api.core.protocols import HeroRepo, ThreatRepo, UserRepo
+from iheroes_api.core.protocols import HeroRepo, ThreatMonitor, ThreatRepo, UserRepo
+from iheroes_api.infra import monitor
 from iheroes_api.infra.database.repositories import (
     hero_repository,
     threat_repository,
@@ -22,6 +23,7 @@ class Dependencies:
     auth_module: AuthModule
     database: Database
     hero_repo: HeroRepo
+    threat_monitor: ThreatMonitor
     threat_repository: ThreatRepo
     user_repo: UserRepo
 
@@ -31,6 +33,7 @@ def _build_dependencies() -> Callable[[], Dependencies]:
         auth_module=build_auth_module(_settings, cast(UserRepo, user_repository)),
         database=database,
         hero_repo=cast(HeroRepo, hero_repository),
+        threat_monitor=cast(ThreatMonitor, monitor),
         threat_repository=cast(ThreatRepo, threat_repository),
         user_repo=cast(UserRepo, user_repository),
     )

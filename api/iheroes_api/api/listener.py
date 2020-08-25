@@ -42,7 +42,9 @@ def init_sio_client(settings: Settings, deps: Dependencies, app: FastAPI) -> Fas
             danger_level=event["dangerLevel"].lower(),
             location=event["location"][0],
         )
-        threat = await threat_service.report_threat(deps.threat_repository, dto)
+        threat = await threat_service.report_threat(
+            deps.threat_monitor, deps.threat_repository, dto
+        )
         logger.info(f"Reported threat of name {threat.name}")
 
     # App event handlers
