@@ -20,6 +20,7 @@ from iheroes_api.infra.database.sqlalchemy import database
 
 
 async def create_pending_occurrence(threat: Threat) -> Threat:
+    print(threat)
     if threat.is_being_monitored():
         raise ThreatMonitoredError(threat)
 

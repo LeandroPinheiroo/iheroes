@@ -314,19 +314,19 @@ class TestThreat:
                             "id": 1,
                             "state": "resolved",
                             "created_at": datetime(2020, 1, 2),
-                            "updated_at": datetime(2020, 1, 2),
+                            "updated_at": datetime(2020, 2, 2),
                         },
                         {
                             "id": 2,
                             "state": "resolved",
                             "created_at": datetime(2020, 1, 1),
-                            "updated_at": datetime(2020, 1, 1),
+                            "updated_at": datetime(2020, 2, 1),
                         },
                     ],
                 )
             )
             first, second = threat.occurrences
-            assert first.updated_at < second.updated_at
+            assert first.created_at < second.created_at
 
         def test_only_one_monitored_state(self, valid_threat):
             with pytest.raises(ValidationError) as excinfo:

@@ -32,7 +32,7 @@ class Threat(BaseModel):
     def sort_occurrences(
         cls, v: Iterable[Occurrence],  # noqa: N805
     ) -> Iterable[Occurrence]:
-        return sorted(v, key=itemgetter("updated_at"))
+        return sorted(v, key=itemgetter("created_at"))
 
     @validator("occurrences")
     def validate_occurrences(

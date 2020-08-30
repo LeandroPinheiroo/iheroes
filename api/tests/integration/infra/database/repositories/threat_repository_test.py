@@ -4,15 +4,44 @@ import pytest
 from pytest_factoryboy import register
 from toolz import assoc, dissoc
 
-from iheroes_api.core.threats.exceptions import ThreatNotFoundError
+from iheroes_api.core.threats.exceptions import (
+    ThreatMonitoredError,
+    ThreatNotFoundError,
+)
+from iheroes_api.core.threats.occurrence import State
 from iheroes_api.infra.database.repositories import threat_repository
-from tests.factories.entity_factories import ReportThreatDtoFactory, ThreatFactory
+from tests.factories.entity_factories import (
+    OccurrenceFactory,
+    ReportThreatDtoFactory,
+    ThreatFactory,
+)
 from tests.factories.model_factories import insert_threat, insert_threat_record
 
-factories = [ReportThreatDtoFactory, ThreatFactory]
+factories = [OccurrenceFactory, ReportThreatDtoFactory, ThreatFactory]
 
 for factory in factories:
     register(factory)
+
+
+@pytest.mark.integration
+@pytest.mark.asyncio
+class TestCreatePendingOccurrence:
+    async def test_success(self, database, threat_factory):
+        threat = threat_factory()
+        insert_threat(threat.dict())
+
+        result = await threat_repository.create_pending_occurrence(threat)
+        assert len(result.occurrences) == 1
+        assert result.occurrences[0].state == State.PENDING
+
+    async def test_threat_monitored(self, database, threat_factory, occurrence_factory):
+        threat = threat_factory(
+            occurrences=(occurrence_factory(state="active").dict(),)
+        )
+        insert_threat(threat.dict())
+
+        with pytest.raises(ThreatMonitoredError):
+            await threat_repository.create_pending_occurrence(threat)
 
 
 @pytest.mark.integration

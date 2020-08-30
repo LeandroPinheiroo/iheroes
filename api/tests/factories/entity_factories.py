@@ -114,11 +114,7 @@ class ThreatFactory(factory.Factory):
     danger_level = DangerLevelFactory
     location = factory.Faker("location")
     occurrences = factory.LazyAttribute(
-        lambda o: [
-            OccurrenceFactory(state="resolved").dict(),
-            OccurrenceFactory(state="resolved").dict(),
-            OccurrenceFactory(state="active").dict(),
-        ]
+        lambda o: [OccurrenceFactory(state="resolved").dict()]
     )
 
 
