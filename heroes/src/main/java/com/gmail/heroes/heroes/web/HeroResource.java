@@ -95,7 +95,7 @@ public class HeroResource {
      *
      * @return HeroDto object saved
      */
-    @PostMapping
+    @PostMapping("/defend")
     public ResponseEntity<HeroDTO> getHeroDefend(@Valid @RequestBody ThreatDTO threatDTO) {
         log.debug("Request to get a hero to defend the world of the threat, {}",threatDTO);
         return ResponseEntity.ok(heroService.getHeroDefend(threatDTO));
