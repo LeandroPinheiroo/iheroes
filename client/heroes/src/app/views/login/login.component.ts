@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { User } from '../../domain/user';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,7 +16,8 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private loginService:LoginService
+    private loginService:LoginService,
+    private toastrService: ToastrService
   ) { }
 
 
@@ -28,13 +30,16 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
+    if(this.form.invalid){
+      return this.toastrService.error('Necessário preencher os campos obrigatórios!','Atenção!');
+    }
     return this.loginService.login(this.user.email, this.user.password)
       .subscribe( (log: any) => {
         this.loginService.setToken(log.access_token);
         this.router.navigate(['/']);
       },
       erro => {
-        console.log("error")
+        this.toastrService.error('Verifique suas credênciais!','Erro!');
       }
     );
   }

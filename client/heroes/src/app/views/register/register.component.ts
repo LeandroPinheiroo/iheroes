@@ -1,3 +1,4 @@
+import { ToastrService } from 'ngx-toastr';
 import { LoginService } from './../../service/login-service';
 import { Router } from '@angular/router';
 import { UserService } from './../../service/user-service';
@@ -17,18 +18,22 @@ export class RegisterComponent {
 
   constructor(
     private router: Router,
-    private userService:UserService
+    private userService:UserService,
+    private toastrService: ToastrService
   ) { }
 
 
   register() {
-    console.log(this.user);
+    if(this.form.invalid){
+      return this.toastrService.error('Necessário preencher os campos obrigatórios!','Atenção!');
+    }
     return this.userService.create(this.user)
       .subscribe( (log: any) => {
-        this.router.navigate(['/']);
+        this.toastrService.success('Cadastrado com sucesso, efetue o login!','Sucesso!');
+        this.router.navigate(['/login']);
       },
       erro => {
-        console.log("error")
+        this.toastrService.error('Ocorreu um erro o se cadastrar!','Erro!');
       }
     );
   }

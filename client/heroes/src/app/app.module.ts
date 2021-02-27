@@ -7,6 +7,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
+import { ToastrModule } from 'ngx-toastr';
+
 
 import { IconModule, IconSetModule, IconSetService } from '@coreui/icons-angular';
 
@@ -64,6 +66,7 @@ export function tokenGetter() {
     AppHeaderModule,
     AppSidebarModule,
     PerfectScrollbarModule,
+    ToastrModule.forRoot(),
     BsDropdownModule.forRoot(),
     TabsModule.forRoot(),
     ChartsModule,
