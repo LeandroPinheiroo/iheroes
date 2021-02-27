@@ -4,6 +4,7 @@ package com.gmail.heroes.heroes.web;
 import com.gmail.heroes.heroes.service.HeroService;
 import com.gmail.heroes.heroes.service.exception.ParametrizedMessageException;
 import com.gmail.heroes.heroes.web.dto.HeroDTO;
+import com.gmail.heroes.heroes.web.dto.ThreatDTO;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,5 +87,17 @@ public class HeroResource {
     public ResponseEntity<HeroDTO> delete(@PathVariable("id") Long id) throws ParametrizedMessageException {
         log.debug("REST request to delete a hero by id {}",id);
         return ResponseEntity.ok(heroService.delete(id));
+    }
+
+
+    /**
+     * POST /api/hero/defend: request to save a hero
+     *
+     * @return HeroDto object saved
+     */
+    @PostMapping
+    public ResponseEntity<HeroDTO> getHeroDefend(@Valid @RequestBody ThreatDTO threatDTO) {
+        log.debug("Request to get a hero to defend the world of the threat, {}",threatDTO);
+        return ResponseEntity.ok(heroService.getHeroDefend(threatDTO));
     }
 }
