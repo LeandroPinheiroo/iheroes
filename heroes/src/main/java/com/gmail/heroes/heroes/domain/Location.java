@@ -30,7 +30,4 @@ public class Location {
     @Column
     private BigDecimal longitude;
 
-    @OneToOne(orphanRemoval = true, mappedBy = "location")
-    private Hero hero;
-
 }

@@ -9,7 +9,7 @@ export const navItems: INavData[] = [
   },
   {
     name: 'Heróis',
-    url: '/dashboard',
+    url: '/hero',
     icon: 'icon-greensock',
   },
   {

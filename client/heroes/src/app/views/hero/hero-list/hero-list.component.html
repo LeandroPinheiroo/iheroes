@@ -1,0 +1,64 @@
+<div class="ui-g ui-fluid">
+    <div class="ui-g-12">
+        <h1>Heróis</h1>
+    </div>
+    <div>
+        <div class="ui-g-12 ui-md-12 ui-lg-12">
+            <p-table [value]="heroes" [paginator]="true" [rows]="4" [responsive]="true"
+                [lazy]="true" (onLazyLoad)="search()" 
+                #table>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th class="col-120">
+                            Nome
+                        </th>
+                        <th class="col-120">
+                            Rank
+                        </th>
+                        <th class="col-acoes-header">Ações</th>
+                    </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-hero>
+                    <tr>
+                        <td class="col-120">
+                        {{hero.name}}
+                        </td>
+                        <td class="col-120">
+                        {{hero.enumHero}}
+                        </td>
+                        <td class="col-acoes">
+                        <button pButton icon="fa fa-pencil" pTooltip="Editar" tooltipPosition="top" class="ui-button-success" style="margin-right: 3px"
+                            [routerLink]="['/hero/update', hero.id]"> </button>
+                        <button pButton icon="fa fa-trash" pTooltip="Excluir" tooltipPosition="top" class="ui-button-success" (click)="checkDelete(hero)"> </button>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage" let-columns>
+                    <tr>
+                        <td class="col-acoes" [attr.colspan]="8">
+                            Nenhum Héroi Cadastrado
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+        <br>
+        <div class="card card-w-title p-5">
+            <!-- Fim do preenchimento da grid com os dados do banco de dados daquele periodo !-->
+            <div class="ui-g-12 d-flex justify-content-center">
+                <a pButton label="Cadastrar Novo Héroi" class="ui-button-success"
+                    routerLink="/hero/create"></a>
+            </div>
+        </div>
+    </div>
+</div>
+  
+<p-dialog [(visible)]="displayDialogConfirm" [focusOnShow]="false" [modal]="true" header="Confirmação">
+    Deseja apagar o herói {{heroSelected.name}}?
+    <p-footer>
+        <button (click)="delete()" class="btn-persistencia" label="Confirmar"
+                pButton type="button"></button>
+        <button (click)="clearDelete()" class="btn-navegacao" label="Cancelar" pButton
+                type="button"></button>
+    </p-footer>
+</p-dialog>

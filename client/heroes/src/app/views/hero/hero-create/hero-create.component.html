@@ -1,0 +1,64 @@
+<div class="ui-g ui-fluid">
+    <div class="ui-g-12">
+        <h1>Heróis</h1>
+    </div>
+    <div class="card card-w-title p-5">
+        <form #form="ngForm" novalidate (ngSubmit)="save()">
+            <div class="form-group">
+                <label for="name">Nome do Héroi</label>
+                <input type="text"
+                        class="form-control"
+                        name="name"
+                        id="name" 
+                        [(ngModel)]="hero.name" >
+            </div>
+            <div class="form-group">
+                <label for="class">Classe</label>
+                <select
+                    class="form-control"
+                    name="class"
+                    id="class" 
+                    [(ngModel)]="hero.enumHero" 
+                >
+                    <option>S</option>
+                    <option>A</option>
+                    <option>B</option>
+                    <option>C</option>
+                </select>
+            </div>
+            <h3>Localização do Herói</h3>
+            <div class="row">
+                <div class="col">
+                    <label for="exampleFormControlSelect1">Latitude</label>
+                    <input type="text" class="form-control" placeholder="Latitude" name="latitude" id="latitude"  [(ngModel)]="hero.location.latitude">
+                </div>
+                <div class="col">
+                    <label for="exampleFormControlSelect1">Longitude</label>
+                    <input type="text" class="form-control" placeholder="Longitude" name="longitude" id="longitude"  [(ngModel)]="hero.location.longitude">
+                </div>
+            </div>
+    
+            <div class="d-flex justify-content-end mt-3">
+                <div class="ui-g-6">
+                    <button pButton
+                            id="consultar"
+                            name="consultar"
+                            type="button"
+                            class="btn-secondary"
+                            label="Voltar">
+                    </button>
+                </div>
+                <div class="ui-g-6 ml-2">
+                    <button pButton
+                            id="consultar"
+                            name="consultar"
+                            type="submit"
+                            class="btn-consulta"
+                            label="Cadastrar">
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+  
