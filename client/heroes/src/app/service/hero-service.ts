@@ -1,3 +1,4 @@
+import { Threat } from './../domain/threat';
 import { Table } from 'primeng/table';
 import { Hero } from './../domain/hero';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
@@ -23,6 +24,10 @@ export class HeroService {
 
   findById(id:number) {
     return this.http.get(`${this.heroUrl}/${id}`, RequestUtil.getHttpOptions());
+  }
+
+  findHeroDefend(threat:Threat) {
+    return this.http.post(`${this.heroUrl}/defend`, threat ,RequestUtil.getHttpOptions());
   }
 
   create(hero:Hero) {

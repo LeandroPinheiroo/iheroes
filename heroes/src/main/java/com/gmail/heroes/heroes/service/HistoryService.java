@@ -1,5 +1,8 @@
 package com.gmail.heroes.heroes.service;
 
+import com.gmail.heroes.heroes.domain.Hero;
+import com.gmail.heroes.heroes.domain.History;
+import com.gmail.heroes.heroes.domain.Threat;
 import com.gmail.heroes.heroes.repository.HistoryRepository;
 import com.gmail.heroes.heroes.service.mapper.HistoryMapper;
 import com.gmail.heroes.heroes.web.dto.HeroDTO;
@@ -23,12 +26,12 @@ public class HistoryService {
     private final HistoryRepository historyRepository;
     private final HistoryMapper historyMapper;
 
-    public HistoryDTO save(HeroDTO heroDTO, ThreatDTO threatDTO){
-        HistoryDTO historyDTO = new HistoryDTO();
-        historyDTO.setHero(heroDTO);
-        historyDTO.setThreat(threatDTO);
-        historyDTO.setBattleDate(LocalDateTime.now());
-        return this.historyMapper.toDto(this.historyRepository.save(this.historyMapper.toEntity(historyDTO)));
+    public HistoryDTO save(Hero hero, Threat threat){
+        History history = new History();
+        history.setHero(hero);
+        history.setThreat(threat);
+        history.setBattleDate(LocalDateTime.now());
+        return this.historyMapper.toDto(this.historyRepository.save(history));
     }
 
     public Page<HistoryDTO> findAll(Pageable pageable) {

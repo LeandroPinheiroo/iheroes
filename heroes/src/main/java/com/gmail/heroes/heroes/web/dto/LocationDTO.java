@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 public class LocationDTO {
 
     private Long id;
-    private BigDecimal latitude;
-    private BigDecimal longitude;
+    private BigDecimal lat;
+    private BigDecimal lng;
 
 }

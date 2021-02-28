@@ -29,11 +29,11 @@ public class Threat {
 
     @NotNull
     @Column(length = 150)
-    private String name;
+    private String monsterName;
 
     @Enumerated(EnumType.STRING)
     @Column
-    private EnumThreat enumThreat;
+    private EnumThreat dangerLevel;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "location_id", referencedColumnName = "id")

@@ -1,23 +1,23 @@
 <div class="animated fadeIn">
   	<div class="row">
-    	<div class="col-lg-12">
+    	<div class="col-lg-12" *ngIf="hero.id">
 			<div class="card">
 				<img src="assets/img/monster.jpg" class="card-img-top img">
-				<div class="card-body d-flex justify-content-around">
-					<div>
+				<div class="card-body d-flex justify-content-around" >
+					<div >
 						<h5 class="card-title">Nova Ameaça Encontrada</h5>
 						<p class="card-text">Um héroi será encaminhado para defender o mundo.</p>
 						<p class="card-text">Dados da ameaça:</p>
-						<p class="card-text">Nome ameaça.</p>
-						<p class="card-text">Nivel.</p>
-						<p class="card-text">Localidade: Latitude e longitude.</p>
+						<p class="card-text">{{threat.monsterName}}.</p>
+						<p class="card-text">{{threat.dangerLevel}}.</p>
+						<p class="card-text">Localidade: {{threat.location.lat}} e {{threat.location.lng}}.</p>
 					</div>
 					<div >
 						<h5 class="card-title">Herói Encarregado</h5>
 						<p class="card-text">Dados do Herói:</p>
-						<p class="card-text">Nome herói.</p>
-						<p class="card-text">Nivel.</p>
-						<p class="card-text">Localidade: Latitude e longitude.</p>
+						<p class="card-text">{{hero.name}}.</p>
+						<p class="card-text">{{hero.enumHero}}.</p>
+						<p class="card-text">Localidade: {{hero.location.lat}} e {{hero.location.lng}}.</p>
 					</div>
 				</div>
 			</div>

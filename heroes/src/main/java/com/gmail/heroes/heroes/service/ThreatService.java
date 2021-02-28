@@ -20,7 +20,7 @@ public class ThreatService {
     private final ThreatMapper threatMapper;
 
     public ThreatDTO save(ThreatDTO threatDTO){
-        Threat threat = threatRepository.findByName(threatDTO.getName()).orElse(threatMapper.toEntity(threatDTO));
+        Threat threat = threatRepository.findByMonsterName(threatDTO.getMonsterName()).orElse(threatMapper.toEntity(threatDTO));
         return this.threatMapper.toDto(this.threatRepository.save(threat));
     }
 }
