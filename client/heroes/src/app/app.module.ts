@@ -1,3 +1,4 @@
+import { SocketService } from './service/socket-service';
 import { HeroCreateComponent } from './views/hero/hero-create/hero-create.component';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
@@ -28,6 +29,8 @@ import { P404Component } from './views/error/404.component';
 import { P500Component } from './views/error/500.component';
 import { LoginComponent } from './views/login/login.component';
 import { RegisterComponent } from './views/register/register.component';
+
+
 
 const APP_CONTAINERS = [
   DefaultLayoutComponent
@@ -103,7 +106,7 @@ export function tokenGetter() {
       provide: LocationStrategy,
       useClass: HashLocationStrategy
     },
-    IconSetService,
+    IconSetService
   ],
   bootstrap: [ AppComponent ]
 })
