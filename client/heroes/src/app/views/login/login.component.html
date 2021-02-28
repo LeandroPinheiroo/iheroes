@@ -24,6 +24,12 @@
                     />
                   </div>
                   <div class="input-group mb-4">
+                    <ng-container
+                          *ngIf="form.controls['email'] && !form.controls['email'].valid && (form.controls['email'].touched || form.submitted)">
+                          <small class="text-danger">Campo Obrigatório</small>
+                    </ng-container>
+                  </div>
+                  <div class="input-group mb-4">
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="icon-lock"></i></span>
                     </div>
@@ -36,6 +42,12 @@
                             [(ngModel)]="user.password" 
                             required
                     />
+                    <div class="input-group mb-4">
+                      <ng-container
+                            *ngIf="form.controls['password'] && !form.controls['password'].valid && (form.controls['password'].touched || form.submitted)">
+                            <small class="text-danger">Campo Obrigatório</small>
+                      </ng-container>
+                    </div>
                   </div>
                   <div class="row">
                     <div class="col-6">

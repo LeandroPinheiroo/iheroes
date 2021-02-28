@@ -1,3 +1,4 @@
+import { HeroModule } from './views/hero/hero.module';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AuthGuard } from './seguranca/auth.guard';
@@ -56,6 +57,26 @@ export const routes: Routes = [
         path: 'dashboard',
         canActivate: [AuthGuard],
         loadChildren: () => import('./views/dashboard/dashboard.module').then(m => m.DashboardModule)
+      },   
+    
+    ]
+  },
+  {
+    path: 'hero',
+    component: DefaultLayoutComponent,
+    data: {
+      title: 'Heróis'
+    },
+    children: [
+      {
+        path: '',
+        canActivate: [AuthGuard],
+        loadChildren: () => import('./views/hero/hero.module').then(m => m.HeroModule)
+      },
+      {
+        path: 'create',
+        canActivate: [AuthGuard],
+        loadChildren: () => import('./views/hero/hero.module').then(m => m.HeroModule)
       },   
     
     ]
