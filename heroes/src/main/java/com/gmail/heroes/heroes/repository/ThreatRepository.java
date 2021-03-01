@@ -9,6 +9,6 @@ import java.util.Optional;
 @Repository
 public interface ThreatRepository extends JpaRepository<Threat, Long> {
 
-    Optional<Threat> findByName(String name);
+    Optional<Threat> findByMonsterName(String name);
 
 }

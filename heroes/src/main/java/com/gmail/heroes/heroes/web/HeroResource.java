@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 
 
 @RestController
@@ -52,7 +53,18 @@ public class HeroResource {
     @GetMapping
     public ResponseEntity<Page<HeroDTO>> filterAll(Pageable pageable) {
         log.debug("REST request to filter All Heroes ");
-        return ResponseEntity.ok(heroService.findAll(pageable));
+        return ResponseEntity.ok(heroService.filterAll(pageable));
+    }
+
+    /**
+     * Get /api/hero: request to get all heroes
+     *
+     * @return List<HeroDto> object find
+     */
+    @GetMapping("/find-all")
+    public ResponseEntity<List<HeroDTO>> findAll() {
+        log.debug("REST request to find All Heroes ");
+        return ResponseEntity.ok(heroService.findAll());
     }
 
     /**

@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface HeroRepository extends JpaRepository<Hero, Long> {
 
-    List<Hero> findHeroByEnumHero(EnumHero enumHero);
+    List<Hero> findHeroByEnumHeroIn(List<EnumHero> enumHero);
 
 }

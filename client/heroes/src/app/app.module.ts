@@ -1,3 +1,4 @@
+import { SocketService } from './service/socket-service';
 import { HeroCreateComponent } from './views/hero/hero-create/hero-create.component';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
@@ -29,6 +30,8 @@ import { P500Component } from './views/error/500.component';
 import { LoginComponent } from './views/login/login.component';
 import { RegisterComponent } from './views/register/register.component';
 
+
+
 const APP_CONTAINERS = [
   DefaultLayoutComponent
 ];
@@ -48,7 +51,7 @@ import { AppRoutingModule } from './app.routing';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ChartsModule } from 'ng2-charts';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule,HttpClientJsonpModule } from '@angular/common/http';
 import { HeroModule } from './views/hero/hero.module';
 
 export function tokenGetter() {
@@ -59,6 +62,7 @@ export function tokenGetter() {
   imports: [
     FormsModule,
     HttpClientModule,
+    HttpClientJsonpModule,
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
@@ -103,7 +107,7 @@ export function tokenGetter() {
       provide: LocationStrategy,
       useClass: HashLocationStrategy
     },
-    IconSetService,
+    IconSetService
   ],
   bootstrap: [ AppComponent ]
 })

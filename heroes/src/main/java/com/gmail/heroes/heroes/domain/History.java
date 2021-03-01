@@ -28,11 +28,11 @@ public class History {
     @Column
     private LocalDateTime battleDate;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "hero_id", referencedColumnName = "id")
     private Hero hero;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "threat_id", referencedColumnName = "id")
     private Threat threat;
 

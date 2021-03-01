@@ -5,6 +5,7 @@ import com.gmail.heroes.heroes.domain.Threat;
 import com.gmail.heroes.heroes.repository.HeroRepository;
 import com.gmail.heroes.heroes.service.exception.ParametrizedMessageException;
 import com.gmail.heroes.heroes.service.mapper.HeroMapper;
+import com.gmail.heroes.heroes.service.mapper.ThreatMapper;
 import com.gmail.heroes.heroes.util.CoordinatesUtil;
 import com.gmail.heroes.heroes.web.dto.HeroDTO;
 import com.gmail.heroes.heroes.web.dto.HistoryDTO;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,6 +29,7 @@ public class HeroService {
 
     private final HeroRepository heroRepository;
     private final HeroMapper heroMapper;
+    private final ThreatMapper threatMapper;
     private final ThreatService threatService;
     private final HistoryService historyService;
 
@@ -34,8 +37,12 @@ public class HeroService {
         return this.heroMapper.toDto(this.heroRepository.save(this.heroMapper.toEntity(heroDTO)));
     }
 
-    public Page<HeroDTO> findAll(Pageable pageable) {
+    public Page<HeroDTO> filterAll(Pageable pageable) {
         return heroRepository.findAll(pageable).map(heroMapper::toDto);
+    }
+
+    public List<HeroDTO> findAll() {
+        return heroMapper.toDtoList(heroRepository.findAll());
     }
 
     public HeroDTO findById(Long id) {
@@ -52,8 +59,8 @@ public class HeroService {
         Hero heroToDefend = null;
         threatDTO = threatService.save(threatDTO);
         double minDistance = Double.MAX_VALUE;
-        for (Hero hero : heroRepository.findHeroByEnumHero(threatDTO.getDangerLevel())) {
-            double distance = CoordinatesUtil.distance(hero.getLocation().getLatitude().doubleValue(),threatDTO.getLocation().getLatitude().doubleValue(),hero.getLocation().getLongitude().doubleValue(),threatDTO.getLocation().getLongitude().doubleValue());
+        for (Hero hero : heroRepository.findHeroByEnumHeroIn(threatDTO.getDangerLevel().findHeroToDefend())) {
+            double distance = CoordinatesUtil.distance(hero.getLocation().getLat().doubleValue(),threatDTO.getLocation().getLat().doubleValue(),hero.getLocation().getLng().doubleValue(),threatDTO.getLocation().getLng().doubleValue());
             if(distance < minDistance){
                 minDistance = distance;
                 heroToDefend = hero;
@@ -61,7 +68,7 @@ public class HeroService {
         }
         Hero hero = Optional.ofNullable(heroToDefend).orElseThrow((() -> new ParametrizedMessageException("Herói não encontrado")));
         HeroDTO heroDTO = heroMapper.toDto(hero);
-        historyService.save(heroDTO,threatDTO);
+        historyService.save(hero,threatMapper.toEntity(threatDTO));
         return heroDTO;
     }
 }

@@ -24,10 +24,10 @@ public class Location {
 
     @NotNull
     @Column
-    private BigDecimal latitude;
+    private BigDecimal lat;
 
     @NotNull
     @Column
-    private BigDecimal longitude;
+    private BigDecimal lng;
 
 }

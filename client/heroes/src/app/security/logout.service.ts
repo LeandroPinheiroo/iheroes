@@ -1,4 +1,4 @@
-import { LoginService } from './../service/login-service';
+import { LoginService } from '../service/login-service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
