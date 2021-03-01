@@ -8,6 +8,7 @@ import { ButtonsModule } from 'ngx-bootstrap/buttons';
 
 import { DashboardComponent } from './dashboard.component';
 import { DashboardRoutingModule } from './dashboard-routing.module';
+import { GoogleMapsModule } from '@angular/google-maps';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { DashboardRoutingModule } from './dashboard-routing.module';
     FormsModule,
     DashboardRoutingModule,
     BsDropdownModule,
-    ButtonsModule.forRoot()
+    ButtonsModule.forRoot(),
+    GoogleMapsModule
   ],
   declarations: [ DashboardComponent ]
 })

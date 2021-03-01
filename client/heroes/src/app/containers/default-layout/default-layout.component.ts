@@ -1,5 +1,5 @@
 import { Router } from '@angular/router';
-import { LogoutService } from './../../seguranca/logout.service';
+import { LogoutService } from '../../security/logout.service';
 import {Component} from '@angular/core';
 import { navItems } from '../../_nav';
 

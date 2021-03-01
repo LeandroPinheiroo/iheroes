@@ -12,9 +12,11 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {LocationMapper.class})
 public interface HeroMapper {
 
-    HeroDTO toDto(Hero user);
+    HeroDTO toDto(Hero hero);
 
-    Hero toEntity(HeroDTO userDTO);
+    List<HeroDTO> toDtoList(List<Hero> hero);
+
+    Hero toEntity(HeroDTO heroDTO);
 
 
 

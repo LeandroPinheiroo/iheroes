@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,8 +37,12 @@ public class HeroService {
         return this.heroMapper.toDto(this.heroRepository.save(this.heroMapper.toEntity(heroDTO)));
     }
 
-    public Page<HeroDTO> findAll(Pageable pageable) {
+    public Page<HeroDTO> filterAll(Pageable pageable) {
         return heroRepository.findAll(pageable).map(heroMapper::toDto);
+    }
+
+    public List<HeroDTO> findAll() {
+        return heroMapper.toDtoList(heroRepository.findAll());
     }
 
     public HeroDTO findById(Long id) {

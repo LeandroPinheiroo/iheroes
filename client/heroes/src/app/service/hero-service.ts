@@ -22,6 +22,10 @@ export class HeroService {
     return this.http.get(this.heroUrl, RequestUtil.getHttpOptions());
   }
 
+  getAll() {
+    return this.http.get(`${this.heroUrl}/find-all`, RequestUtil.getHttpOptions());
+  }
+
   findById(id:number) {
     return this.http.get(`${this.heroUrl}/${id}`, RequestUtil.getHttpOptions());
   }

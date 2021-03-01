@@ -51,7 +51,7 @@ import { AppRoutingModule } from './app.routing';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ChartsModule } from 'ng2-charts';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule,HttpClientJsonpModule } from '@angular/common/http';
 import { HeroModule } from './views/hero/hero.module';
 
 export function tokenGetter() {
@@ -62,6 +62,7 @@ export function tokenGetter() {
   imports: [
     FormsModule,
     HttpClientModule,
+    HttpClientJsonpModule,
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
