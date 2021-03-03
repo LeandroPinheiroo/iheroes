@@ -1,6 +1,7 @@
 package com.gmail.heroes.heroes.web;
 
 
+import com.gmail.heroes.heroes.builder.UserBuilder;
 import com.gmail.heroes.heroes.domain.User;
 import com.gmail.heroes.heroes.repository.UserRepository;
 import com.gmail.heroes.heroes.security.RunWithMockCustomUser;
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -33,18 +35,22 @@ public class UserResourceIt {
     @Autowired
     private MockMvc mockMvc;
 
+    private UserBuilder userBuilder = new UserBuilder();
+
     @Test
     @RunWithMockCustomUser
-    public void buscarDemostrativoFilter() throws Exception {
-        when(userRepository.save(any())).thenReturn(new User());
-        UserDTO userDTO = new UserDTO();
-        userDTO.setName("a");
-        userDTO.setEmail("testeNOVO123@gmail.com");
-        userDTO.setPassword("1234567");
+    public void saveUser() throws Exception {
+        UserDTO userDTO = userBuilder.mountUserDto();
+        User user = new User();
+        user.setName(userDTO.getName());
+        user.setEmail(userDTO.getEmail());
+        when(userRepository.save(any())).thenReturn(user);
         mockMvc.perform(post(API)
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(TestUtil.convertObjectToJsonBytes(userDTO))
                 .contentType(TestUtil.APPLICATION_JSON_UTF8))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(user.getName()));
+
     }
 }
